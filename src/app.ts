@@ -13,7 +13,7 @@ class App {
 
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
-    this.initializeDatabaseConnection();
+    //this.initializeDatabaseConnection();
     this.initializeErrorHandling();
   }
 

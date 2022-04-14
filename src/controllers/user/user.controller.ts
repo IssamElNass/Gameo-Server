@@ -1,12 +1,13 @@
-import { Router } from "express";
-import Controller from "../interfaces/controller";
-import BaseController from "./base.controller";
+import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import { getAllUsers, addUser } from "../services/userService";
+import UserService from "../../services/user/userService";
 
 class UserController extends BaseController {
+  private userService: UserService;
+
   constructor() {
     super("/users");
+    this.userService = new UserService();
     this.intializeRoutes();
   }
 
@@ -15,7 +16,7 @@ class UserController extends BaseController {
   }
 
   public async getUsers(req: Request, res: Response, next: NextFunction) {
-    const test: any = await getAllUsers();
+    const test: any = await this.userService.getAll();
     console.log(test);
 
     return res.status(200).json({
