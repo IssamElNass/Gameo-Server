@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getAllUsers, addUser } from "../services/userService";
 import { User, UserRegisterDTO } from "../model/user";
-import validateParams from "../utils/validateParams";
 
 // getting all posts
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,16 +12,9 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-const validatorObject: UserRegisterDTO = {
-  username: "",
-  email: "string",
-  password: "string",
-};
-
 // adding a post
 const addNewUser = async (req: Request, res: Response, next: NextFunction) => {
-  if (!validateParams(req.body, validatorObject))
-    res.status(400).send("Invalid body");
+  res.status(400).send("Invalid body");
 
   // get the data from req.body
   let newUser = req.body;
