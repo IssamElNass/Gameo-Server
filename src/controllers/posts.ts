@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import axios, { AxiosResponse } from "axios";
-
+import { getAllUsers } from "../services/userService";
 interface Post {
   userId: Number;
   id: Number;
@@ -10,6 +10,9 @@ interface Post {
 
 // getting all posts
 const getPosts = async (req: Request, res: Response, next: NextFunction) => {
+  const test: any = await getAllUsers();
+  console.log(test);
+
   // get some posts
   let result: AxiosResponse = await axios.get(
     `https://jsonplaceholder.typicode.com/posts`

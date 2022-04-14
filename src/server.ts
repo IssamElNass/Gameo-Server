@@ -3,6 +3,8 @@ import express, { Express } from "express";
 import morgan from "morgan";
 import "dotenv/config";
 import routes from "./routes/posts";
+import routesUser from "./routes/users";
+
 import pool from "./config/dbconfig";
 
 const router: Express = express();
@@ -33,6 +35,7 @@ router.use((req, res, next) => {
 
 /** Routes */
 router.use("/api", routes);
+router.use("/api", routesUser);
 
 /** Error handling */
 router.use((req, res, next) => {
