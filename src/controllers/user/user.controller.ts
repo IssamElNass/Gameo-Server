@@ -1,40 +1,46 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
 import UserService from "../../services/user/userService";
+import { UserRegisterDTO } from "../../model/user";
+import { isAuthenticated } from "../../middelware";
 
 class UserController extends BaseController {
-  private userService: UserService;
+  private userService: UserService = new UserService();
 
   constructor() {
     super("/users");
-    this.userService = new UserService();
     this.intializeRoutes();
   }
 
   public intializeRoutes() {
-    this.setGetRoute(this.getUsers);
+    this.setGetRoute(this.getUsers, [isAuthenticated]);
+    this.setPostRoute(this.addNewUser);
   }
 
-  public async getUsers(req: Request, res: Response, next: NextFunction) {
+  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     const test: any = await this.userService.getAll();
     console.log(test);
 
     return res.status(200).json({
       message: test.rows,
     });
-  }
+  };
 
-  public async addNewUser(req: Request, res: Response, next: NextFunction) {
+  public addNewUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     // get the data from req.body
-    let newUser = req.body;
-    console.log(newUser);
+    let user: UserRegisterDTO = req.body;
+    console.log(user);
 
-    //await addUser();
+    const test: any = await this.userService.saveUser(user);
     // return response
     return res.status(200).json({
-      message: "ok",
+      message: test.rows,
     });
-  }
+  };
 }
 
 export default UserController;

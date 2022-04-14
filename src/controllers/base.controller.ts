@@ -7,28 +7,45 @@ class BaseController implements Controller {
 
   constructor(path: string) {
     this.apiUrl = path;
-    // this.intializeRoutes();
   }
 
-  // public intializeRoutes() {
-  //   this.router.get(this.path, this.getAllPosts);
-  //   this.router.post(this.path, this.createAPost);
-  // }
-
-  public setGetRoute(func: any) {
-    this.router.get(this.apiUrl, func);
+  private setRoute(method: string, func: any, middelwares?: any[]) {
+    switch (method.toUpperCase()) {
+      case "GET":
+        if (middelwares) this.router.get(this.apiUrl, middelwares, func);
+        else this.router.get(this.apiUrl, func);
+        break;
+      case "POST":
+        if (middelwares) this.router.get(this.apiUrl, middelwares, func);
+        else this.router.post(this.apiUrl, func);
+        break;
+      case "PATCH":
+        if (middelwares) this.router.get(this.apiUrl, middelwares, func);
+        else this.router.patch(this.apiUrl, func);
+        break;
+      case "DELETE":
+        if (middelwares) this.router.get(this.apiUrl, middelwares, func);
+        else this.router.delete(this.apiUrl, func);
+        break;
+      default:
+        break;
+    }
   }
 
-  public setPostRoute(func: any) {
-    this.router.post(this.apiUrl, func);
+  public setGetRoute(func: any, middelwares?: any[]) {
+    this.setRoute("GET", func, middelwares);
   }
 
-  public setUpdateRoute(func: any) {
-    this.router.patch(this.apiUrl, func);
+  public setPostRoute(func: any, middelwares?: any[]) {
+    this.setRoute("POST", func, middelwares);
   }
 
-  public setDeleteRoute(func: any) {
-    this.router.delete(this.apiUrl, func);
+  public setUpdateRoute(func: any, middelwares?: any[]) {
+    this.setRoute("PATCH", func, middelwares);
+  }
+
+  public setDeleteRoute(func: any, middelwares?: any[]) {
+    this.setRoute("DELETE", func, middelwares);
   }
 }
 

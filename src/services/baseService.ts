@@ -1,4 +1,4 @@
-import { Pool, QueryResult } from "pg";
+import { Pool } from "pg";
 import Service from "../interfaces/service";
 import DB from "../config/dbconfig";
 

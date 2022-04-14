@@ -1,12 +1,12 @@
 export interface User {
-  userId: Number;
-  username: String;
-  email: String;
-  password: String;
+  userId: number;
+  username: string;
+  email: string;
+  password: string;
 }
 
 export interface UserRegisterDTO {
-  username: String;
-  email: String;
-  password: String;
+  username: string;
+  email: string;
+  password: string;
 }
