@@ -1,7 +1,10 @@
 {
   "name": "gameo-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend Server for Gameo",
+  "repository": {
+    "url": "https://github.com/IssamElNass/Gameo-Server"
+  },
   "main": "src/server.ts",
   "scripts": {
     "dev": "nodemon src/server.ts",
