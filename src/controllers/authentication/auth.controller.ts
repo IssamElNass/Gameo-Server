@@ -25,10 +25,10 @@ class AuthController extends BaseController {
     let user: AuthRegisterDTO = req.body;
     console.log(user);
 
-    const test: any = await this.authService.registerUser(user);
+    const token: string = await this.authService.registerUser(user);
     // return response
     return res.status(200).json({
-      message: test.rows,
+      auth_token: token,
     });
   };
 }

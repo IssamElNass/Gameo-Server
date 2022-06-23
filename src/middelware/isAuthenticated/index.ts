@@ -9,11 +9,16 @@ export const isAuthenticated = (
   console.log("test");
 
   const authHeader = req.headers["authorization"];
-  if (authHeader == null) return res.status(401);
+  console.log(authHeader);
+  if (authHeader == null || authHeader == undefined) {
+    console.log("return unauthorized");
+    return res.status(401);
+  }
 
   const token: string = authHeader.split(" ")[1];
-  if (token == null) return res.status(401);
-  if (process.env.TOKEN_SECRET == null) return res.status(401);
+  if (token == null || authHeader == undefined) return res.status(401);
+  if (process.env.TOKEN_SECRET == null || authHeader == undefined)
+    return res.status(401);
   jwt.verify(
     token,
     process.env.TOKEN_SECRET as string,
