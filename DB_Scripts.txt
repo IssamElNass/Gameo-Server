@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS gameo.users
+(
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    username character varying(60) COLLATE pg_catalog."default",
+    email character varying COLLATE pg_catalog."default",
+    display_name character varying(60) COLLATE pg_catalog."default",
+    bio character varying(130) COLLATE pg_catalog."default",
+    password character varying COLLATE pg_catalog."default",
+    private boolean DEFAULT false,
+    created_at timestamp with time zone DEFAULT now(),
+    role character varying,
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_email_key UNIQUE (email),
+    CONSTRAINT users_username_key UNIQUE (username)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS gameo.users
+    OWNER to postgres;
