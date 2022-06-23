@@ -3,3 +3,8 @@ export interface AuthRegisterDTO {
   email: string;
   password: string;
 }
+
+export interface PayloadDTO {
+  username: string;
+  userId: string;
+}

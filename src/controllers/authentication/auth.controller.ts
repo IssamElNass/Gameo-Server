@@ -13,7 +13,7 @@ class AuthController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setPostRoute(this.registerNewUser);
+    this.setPostRoute({ func: this.registerNewUser, path: "/register" });
   }
 
   public registerNewUser = async (
