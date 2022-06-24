@@ -1,3 +1,4 @@
 import isAuthenticated from "./isAuthenticated";
+import handleError from "./handleError";
 
-export { isAuthenticated };
+export { isAuthenticated, handleError };

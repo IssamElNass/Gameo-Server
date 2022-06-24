@@ -9,8 +9,6 @@ class AuthService extends BaseService {
   }
 
   public async registerUser(user: AuthRegisterDTO): Promise<string> {
-    // check if user exists
-
     const hashedPassword = bcrypt.hashSync(user.password, 14);
 
     const data = await this.db.query(`INSERT INTO gameo.users(
@@ -28,8 +26,6 @@ class AuthService extends BaseService {
 
   public async getUserByToken(token: string): Promise<any> {
     const userDetails: PayloadDTO = verifyToken(token);
-    console.log("VERIFY COMPLETE");
-    console.log(userDetails);
 
     return await this.db.query(
       `select id, username, email, bio, profile_picture, role, verified from gameo.users where id::text =  '${userDetails.userId}';`

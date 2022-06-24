@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import AuthService from "../../services/auth/authService";
 import { AuthRegisterDTO } from "../../model/auth";
 import { isAuthenticated } from "../../middelware";
+import { Error } from "../../model/error";
 
 class MeController extends BaseController {
   private authService: AuthService = new AuthService();
@@ -25,15 +26,10 @@ class MeController extends BaseController {
     next: NextFunction
   ) => {
     let user: AuthRegisterDTO = req.body;
-    console.log(user);
 
     const authHeader = req.headers["authorization"];
-    if (authHeader == null || authHeader == undefined) {
-      console.log("return unauthorized");
-      return res.status(401).json({
-        status: "UNAUTHORIZED",
-      });
-    }
+    if (authHeader == null || authHeader == undefined)
+      throw new Error("Unauthorized", 401);
 
     const token: string = authHeader.split(" ")[1];
 
