@@ -8,3 +8,8 @@ export interface PayloadDTO {
   username: string;
   userId: string;
 }
+
+export interface AuthSignInDTO {
+  username: string;
+  password: string;
+}

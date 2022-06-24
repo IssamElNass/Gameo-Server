@@ -1,6 +1,6 @@
 import BaseService from "../baseService";
 import bcrypt from "bcrypt";
-import { AuthRegisterDTO, PayloadDTO } from "../../model/auth";
+import { AuthRegisterDTO, AuthSignInDTO, PayloadDTO } from "../../model/auth";
 import { generateToken, verifyToken } from "../../utils/jwt.utils";
 
 class AuthService extends BaseService {
@@ -22,6 +22,13 @@ class AuthService extends BaseService {
 
     // return the token
     return token;
+  }
+
+  public async signIn(user: AuthSignInDTO): Promise<string> {
+    const hashedPassword = bcrypt.hashSync(user.password, 14);
+
+    // return the token
+    return "token";
   }
 
   public async getUserByToken(token: string): Promise<any> {
