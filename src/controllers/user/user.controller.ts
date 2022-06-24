@@ -1,7 +1,6 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
 import UserService from "../../services/user/userService";
-import { UserRegisterDTO } from "../../model/user";
 import { isAuthenticated } from "../../middelware";
 
 class UserController extends BaseController {
@@ -17,11 +16,8 @@ class UserController extends BaseController {
   }
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-    const test: any = await this.userService.getAll();
-    console.log(test);
-
     return res.status(200).json({
-      message: test.rows,
+      message: "success",
     });
   };
 }

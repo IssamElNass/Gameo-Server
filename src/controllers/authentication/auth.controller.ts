@@ -2,8 +2,8 @@ import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
 import AuthService from "../../services/auth/authService";
 import { AuthRegisterDTO } from "../../model/auth";
-import { isAuthenticated } from "../../middelware";
 import UserService from "../../services/user/userService";
+import { Error } from "../../model/error";
 
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
@@ -23,15 +23,25 @@ class AuthController extends BaseController {
     res: Response,
     next: NextFunction
   ) => {
-    // get the data from req.body
-    let user: AuthRegisterDTO = req.body;
-    console.log(user);
+    try {
+      if (Object.keys(req.body).length < 2)
+        throw new Error("Issue with the request body", 400);
 
-    const token: string = await this.authService.registerUser(user);
-    // return response
-    return res.status(200).json({
-      auth_token: token,
-    });
+      // get the data from req.body
+      let user: AuthRegisterDTO = req.body;
+
+      // Check if username / email is already linked with a user
+      await this.userService.checkIfUserExists(user.username, user.email);
+
+      const token: string = await this.authService.registerUser(user);
+
+      // return response
+      return res.status(200).json({
+        auth_token: token,
+      });
+    } catch (error: any) {
+      next(new Error(error.message, error.status));
+    }
   };
 }
 

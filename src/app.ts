@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import Controller from "./interfaces/controller";
 import pool from "./config/dbconfig";
+import { handleError } from "./middelware";
 
 class App {
   public app: express.Application;
@@ -54,12 +55,7 @@ class App {
 
   private initializeErrorHandling() {
     /** Error handling */
-    this.app.use((req, res, next) => {
-      const error = new Error("not found");
-      return res.status(404).json({
-        message: error.message,
-      });
-    });
+    this.app.use(handleError);
   }
 
   public listen() {

@@ -16,7 +16,6 @@ class BaseController implements Controller {
     middelwares?: any[]
   ) {
     const fullUrl: string = this.apiUrl + path;
-    console.log(fullUrl);
 
     switch (method.toUpperCase()) {
       case "GET":
