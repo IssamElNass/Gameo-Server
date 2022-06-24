@@ -3,9 +3,11 @@ import { Request, Response, NextFunction } from "express";
 import AuthService from "../../services/auth/authService";
 import { AuthRegisterDTO } from "../../model/auth";
 import { isAuthenticated } from "../../middelware";
+import UserService from "../../services/user/userService";
 
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
+  private userService: UserService = new UserService();
 
   constructor() {
     super("/auth");
@@ -13,7 +15,7 @@ class AuthController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setPostRoute(this.registerNewUser);
+    this.setPostRoute({ func: this.registerNewUser, path: "/register" });
   }
 
   public registerNewUser = async (

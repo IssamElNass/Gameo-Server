@@ -13,30 +13,13 @@ class UserController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setGetRoute(this.getUsers, [isAuthenticated]);
-    this.setPostRoute(this.addNewUser);
+    this.setGetRoute({ func: this.getUsers, middelwares: [isAuthenticated] });
   }
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
     const test: any = await this.userService.getAll();
     console.log(test);
 
-    return res.status(200).json({
-      message: test.rows,
-    });
-  };
-
-  public addNewUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    // get the data from req.body
-    let user: UserRegisterDTO = req.body;
-    console.log(user);
-
-    const test: any = await this.userService.saveUser(user);
-    // return response
     return res.status(200).json({
       message: test.rows,
     });

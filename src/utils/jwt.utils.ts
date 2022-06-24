@@ -1,11 +1,12 @@
-import { sign, SignOptions } from "jsonwebtoken";
+import { sign, SignOptions, verify, decode } from "jsonwebtoken";
+import { PayloadDTO } from "../model/auth";
 
 /**
  * generates JWT used for local testing
  */
-export function generateToken(userId: number, username: string): string {
+export function generateToken(userId: string, username: string): string {
   // information to be encoded in the JWT
-  const payload = {
+  const payload: PayloadDTO = {
     username: username,
     userId: userId,
   };
@@ -19,4 +20,28 @@ export function generateToken(userId: number, username: string): string {
 
   // generate JWT
   return sign(payload, privateKey, signInOptions);
+}
+
+export function verifyToken(token: string): PayloadDTO {
+  let payload: PayloadDTO;
+  let test: any = verify(
+    token,
+    process.env.TOKEN_SECRET as string,
+    (err: any, data: any) => {
+      console.log(err);
+
+      payload = {
+        userId: data.userId,
+        username: data.username,
+      };
+      if (err) console.error("ERROR");
+      return data;
+    }
+  );
+  console.log(test);
+  payload = {
+    userId: test.userId,
+    username: test.username,
+  };
+  return payload;
 }
