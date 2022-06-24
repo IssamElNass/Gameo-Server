@@ -9,6 +9,8 @@ class AuthService extends BaseService {
   }
 
   public async registerUser(user: AuthRegisterDTO): Promise<string> {
+    // check if user exists
+
     const hashedPassword = bcrypt.hashSync(user.password, 14);
 
     const data = await this.db.query(`INSERT INTO gameo.users(
@@ -17,9 +19,10 @@ class AuthService extends BaseService {
       '${user.username}', '${user.email.toLowerCase()}','${hashedPassword}'
       ) RETURNING id, username`);
 
-    // Create token
+    // Create the jwt token
     const token: string = generateToken(data.rows[0].id, data.rows[0].username);
-    // save user token
+
+    // return the token
     return token;
   }
 

@@ -21,6 +21,10 @@ class UserService extends BaseService {
       '${user.username}', '${user.email}','${hashedPassword}','${user.username}'
       )`);
   }
+
+  public async checkIfUserExists(user: UserRegisterDTO) {
+    // TODO
+  }
 }
 
 export default UserService;

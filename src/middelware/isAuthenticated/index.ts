@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
+// Check if user is authenticated
 export default function isAuthenticated(
   req: Request,
   res: Response,
@@ -23,6 +24,7 @@ export default function isAuthenticated(
     return res.status(401).json({
       status: "UNAUTHORIZED",
     });
+  // Verify the token
   jwt.verify(
     token,
     process.env.TOKEN_SECRET as string,
