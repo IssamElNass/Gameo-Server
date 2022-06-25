@@ -1,5 +1,5 @@
-import BaseService from "../baseService";
-import { Error } from "../../model/error";
+import BaseService from "../base.service";
+import { Error } from "../../model/error.model";
 
 class UserService extends BaseService {
   constructor() {
@@ -7,14 +7,14 @@ class UserService extends BaseService {
   }
 
   // get one by email
-  public async findOneByEmail(email: string): Promise<any[]> {
+  public async findOneByEmail(email: string): Promise<any> {
     const result: any = await this.db.query(
       `select exists(select 1 from gameo.users WHERE email = '${email}')`
     );
     return result.rows[0];
   }
   // get one by username
-  public async findOneByUsername(username: string): Promise<any[]> {
+  public async findOneByUsername(username: string): Promise<any> {
     const result: any = await this.db.query(
       `select exists(select 1 from gameo.users WHERE username = '${username}')`
     );

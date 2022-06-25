@@ -1,6 +1,10 @@
-import BaseService from "../baseService";
+import BaseService from "../base.service";
 import bcrypt from "bcrypt";
-import { AuthRegisterDTO, PayloadDTO } from "../../model/auth";
+import {
+  AuthRegisterDTO,
+  AuthSignInDTO,
+  PayloadDTO,
+} from "../../model/auth.model";
 import { generateToken, verifyToken } from "../../utils/jwt.utils";
 
 class AuthService extends BaseService {
@@ -24,11 +28,35 @@ class AuthService extends BaseService {
     return token;
   }
 
+  public async signIn(user: AuthSignInDTO): Promise<any> {
+    const result: any = await this.getUserByEmail(user.email);
+    let foundUser: any = result.rows[0];
+    console.log(foundUser);
+
+    if (
+      foundUser &&
+      (await bcrypt.compare(user.password, foundUser.password))
+    ) {
+      // Create token
+      const token: string = generateToken(foundUser.id, foundUser.username);
+      foundUser.token = token;
+      return foundUser;
+    }
+    // return the token
+    return null;
+  }
+
   public async getUserByToken(token: string): Promise<any> {
     const userDetails: PayloadDTO = verifyToken(token);
 
     return await this.db.query(
       `select id, username, email, bio, profile_picture, role, verified from gameo.users where id::text =  '${userDetails.userId}';`
+    );
+  }
+
+  public async getUserByEmail(email: string): Promise<any> {
+    return await this.db.query(
+      `select id, username, email, password, bio, profile_picture, role, verified from gameo.users where email =  '${email}';`
     );
   }
 }

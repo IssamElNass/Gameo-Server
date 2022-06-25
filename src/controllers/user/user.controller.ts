@@ -1,6 +1,6 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import UserService from "../../services/user/userService";
+import UserService from "../../services/user/user.service";
 import { isAuthenticated } from "../../middelware";
 
 class UserController extends BaseController {

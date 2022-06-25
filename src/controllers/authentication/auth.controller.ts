@@ -1,9 +1,9 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import AuthService from "../../services/auth/authService";
-import { AuthRegisterDTO } from "../../model/auth";
-import UserService from "../../services/user/userService";
-import { Error } from "../../model/error";
+import AuthService from "../../services/auth/auth.service";
+import { AuthRegisterDTO, AuthSignInDTO } from "../../model/auth.model";
+import UserService from "../../services/user/user.service";
+import { Error } from "../../model/error.model";
 
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
@@ -16,6 +16,7 @@ class AuthController extends BaseController {
 
   public intializeRoutes() {
     this.setPostRoute({ func: this.registerNewUser, path: "/register" });
+    this.setPostRoute({ func: this.signIn, path: "/signin" });
   }
 
   public registerNewUser = async (
@@ -38,6 +39,35 @@ class AuthController extends BaseController {
       // return response
       return res.status(200).json({
         auth_token: token,
+      });
+    } catch (error: any) {
+      next(new Error(error.message, error.status));
+    }
+  };
+
+  public signIn = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (Object.keys(req.body).length < 1)
+        throw new Error("Issue with the request body", 400);
+
+      // get the data from req.body
+      let user: AuthSignInDTO = req.body;
+      // Check if user exists
+      const userExists: boolean = await this.userService.findOneByEmail(
+        user.email.trim()
+      );
+      if (!userExists) throw new Error("User doesn't exists", 400);
+
+      const userWithToken: any = await this.authService.signIn(user);
+
+      if (!userWithToken)
+        throw new Error(
+          "Login failed, please check your e-mail and password",
+          403
+        );
+      // return response
+      return res.status(200).json({
+        auth_token: userWithToken.token,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));

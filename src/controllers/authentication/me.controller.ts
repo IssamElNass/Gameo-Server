@@ -1,9 +1,9 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import AuthService from "../../services/auth/authService";
-import { AuthRegisterDTO } from "../../model/auth";
+import AuthService from "../../services/auth/auth.service";
+import { AuthRegisterDTO } from "../../model/auth.model";
 import { isAuthenticated } from "../../middelware";
-import { Error } from "../../model/error";
+import { Error } from "../../model/error.model";
 
 class MeController extends BaseController {
   private authService: AuthService = new AuthService();

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import App from "./app";
-import { getAllControllers } from "./utils/controllers.util";
+import { getAllControllers } from "./utils/controller.utils";
 
 const PORT: any = process.env.PORT ?? 6060;
 
