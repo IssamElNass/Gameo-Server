@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Error } from "../../model/error";
+import { Error } from "../../model/error.model";
 
 // Check if user is authenticated
 export default function handleError(

@@ -1,5 +1,5 @@
-import BaseService from "../baseService";
-import { Error } from "../../model/error";
+import BaseService from "../base.service";
+import { Error } from "../../model/error.model";
 
 class UserService extends BaseService {
   constructor() {

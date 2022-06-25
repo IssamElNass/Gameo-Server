@@ -10,6 +10,6 @@ export interface PayloadDTO {
 }
 
 export interface AuthSignInDTO {
-  username: string;
+  email: string;
   password: string;
 }

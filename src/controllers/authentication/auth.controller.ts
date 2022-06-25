@@ -1,9 +1,9 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import AuthService from "../../services/auth/authService";
-import { AuthRegisterDTO, AuthSignInDTO } from "../../model/auth";
-import UserService from "../../services/user/userService";
-import { Error } from "../../model/error";
+import AuthService from "../../services/auth/auth.service";
+import { AuthRegisterDTO, AuthSignInDTO } from "../../model/auth.model";
+import UserService from "../../services/user/user.service";
+import { Error } from "../../model/error.model";
 
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
@@ -53,16 +53,21 @@ class AuthController extends BaseController {
       // get the data from req.body
       let user: AuthSignInDTO = req.body;
       // Check if user exists
-      const userExists: boolean = await this.userService.findOneByUsername(
-        user.username
+      const userExists: boolean = await this.userService.findOneByEmail(
+        user.email.trim()
       );
       if (!userExists) throw new Error("User doesn't exists", 400);
 
-      const token: string = await this.authService.signIn(user);
+      const userWithToken: any = await this.authService.signIn(user);
 
+      if (!userWithToken)
+        throw new Error(
+          "Login failed, please check your e-mail and password",
+          403
+        );
       // return response
       return res.status(200).json({
-        auth_token: token,
+        auth_token: userWithToken.token,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));

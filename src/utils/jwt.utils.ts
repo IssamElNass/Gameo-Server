@@ -1,5 +1,5 @@
 import { sign, SignOptions, verify, decode } from "jsonwebtoken";
-import { PayloadDTO } from "../model/auth";
+import { PayloadDTO } from "../model/auth.model";
 
 /**
  * generates JWT used for local testing
