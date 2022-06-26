@@ -2,7 +2,7 @@ import { sign, SignOptions, verify, decode } from "jsonwebtoken";
 import { PayloadDTO } from "../model/auth.model";
 
 /**
- * generates JWT used for local testing
+ * generates JWT
  */
 export function generateToken(userId: string, username: string): string {
   // information to be encoded in the JWT
@@ -38,7 +38,6 @@ export function verifyToken(token: string): PayloadDTO {
       return data;
     }
   );
-  console.log(test);
   payload = {
     userId: test.userId,
     username: test.username,

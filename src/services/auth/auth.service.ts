@@ -1,4 +1,5 @@
 import BaseService from "../base.service";
+import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import {
   AuthRegisterDTO,
@@ -12,17 +13,17 @@ class AuthService extends BaseService {
     super();
   }
 
-  public async registerUser(user: AuthRegisterDTO): Promise<string> {
-    const hashedPassword = bcrypt.hashSync(user.password, 14);
+  public async registerUser(registerUser: AuthRegisterDTO): Promise<string> {
+    const hashedPassword = bcrypt.hashSync(registerUser.password, 14);
+    let user: Prisma.UserCreateInput = {
+      email: registerUser.email,
+      username: registerUser.username,
+      password: hashedPassword,
+    };
 
-    const data = await this.db.query(`INSERT INTO gameo.users(
-      username, email, password
-      ) VALUES(
-      '${user.username}', '${user.email.toLowerCase()}','${hashedPassword}'
-      ) RETURNING id, username`);
-
+    const createdUser = await this.prismaClient.user.create({ data: user });
     // Create the jwt token
-    const token: string = generateToken(data.rows[0].id, data.rows[0].username);
+    const token: string = generateToken(createdUser.id, createdUser.username);
 
     // return the token
     return token;
@@ -30,8 +31,7 @@ class AuthService extends BaseService {
 
   public async signIn(user: AuthSignInDTO): Promise<any> {
     const result: any = await this.getUserByEmail(user.email);
-    let foundUser: any = result.rows[0];
-    console.log(foundUser);
+    let foundUser: any = result;
 
     if (
       foundUser &&
@@ -48,16 +48,29 @@ class AuthService extends BaseService {
 
   public async getUserByToken(token: string): Promise<any> {
     const userDetails: PayloadDTO = verifyToken(token);
-
-    return await this.db.query(
-      `select id, username, email, bio, profile_picture, role, verified from gameo.users where id::text =  '${userDetails.userId}';`
-    );
+    const result: any = await this.prismaClient.user.findUnique({
+      where: {
+        id: userDetails.userId,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        bio: true,
+        profile_picture: true,
+        role: true,
+        verified: true,
+      },
+    });
+    return result;
   }
 
   public async getUserByEmail(email: string): Promise<any> {
-    return await this.db.query(
-      `select id, username, email, password, bio, profile_picture, role, verified from gameo.users where email =  '${email}';`
-    );
+    return await this.prismaClient.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
   }
 }
 

@@ -25,19 +25,17 @@ class MeController extends BaseController {
     res: Response,
     next: NextFunction
   ) => {
-    let user: AuthRegisterDTO = req.body;
-
     const authHeader = req.headers["authorization"];
     if (authHeader == null || authHeader == undefined)
       throw new Error("Unauthorized", 401);
 
     const token: string = authHeader.split(" ")[1];
 
-    const rows: any = await this.authService.getUserByToken(token);
-    console.log(rows);
+    const foundUser: any = await this.authService.getUserByToken(token);
+    console.log(foundUser);
 
     return res.status(200).json({
-      data: rows.rows[0],
+      data: foundUser,
     });
   };
 }
