@@ -16,9 +16,6 @@ class UserService extends BaseService {
         bio: true,
       },
     });
-    // await this.db.query(
-    //   `select exists(select 1 from gameo.users WHERE email = '${email}')`
-    // );
     return result;
   }
 

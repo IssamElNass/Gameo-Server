@@ -1,6 +1,5 @@
 import BaseService from "../base.service";
 import { Prisma } from "@prisma/client";
-
 import bcrypt from "bcrypt";
 import {
   AuthRegisterDTO,
@@ -33,6 +32,7 @@ class AuthService extends BaseService {
   public async signIn(user: AuthSignInDTO): Promise<any> {
     const result: any = await this.getUserByEmail(user.email);
     let foundUser: any = result;
+
     if (
       foundUser &&
       (await bcrypt.compare(user.password, foundUser.password))

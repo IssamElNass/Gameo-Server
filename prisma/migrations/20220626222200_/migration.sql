@@ -1,4 +1,19 @@
 -- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "username" VARCHAR(40) NOT NULL,
+    "password" VARCHAR NOT NULL,
+    "email" VARCHAR(155) NOT NULL,
+    "bio" TEXT,
+    "profile_picture" VARCHAR NOT NULL DEFAULT E'https://wallpaperaccess.com/full/4595683.jpg',
+    "role" VARCHAR(20) NOT NULL DEFAULT E'FREE',
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Collection" (
     "id" SERIAL NOT NULL,
     "statusId" INTEGER NOT NULL,
@@ -12,7 +27,7 @@ CREATE TABLE "Collection" (
 CREATE TABLE "Status" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "description" VARCHAR(150) NOT NULL,
+    "description" VARCHAR(150),
 
     CONSTRAINT "Status_pkey" PRIMARY KEY ("id")
 );
@@ -22,12 +37,18 @@ CREATE TABLE "Game" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(250) NOT NULL,
     "slug" VARCHAR(250) NOT NULL,
-    "description" VARCHAR(500) NOT NULL,
-    "igdb_id" INTEGER NOT NULL,
+    "description" VARCHAR(500),
+    "igdb_id" INTEGER,
     "gamecover" VARCHAR(800) NOT NULL,
 
     CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Status_name_key" ON "Status"("name");
