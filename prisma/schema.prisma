@@ -41,11 +41,47 @@ model Status {
 }
 
 model Game {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique @db.VarChar(250)
-  slug        String       @unique @db.VarChar(250)
-  description String?      @db.VarChar(500)
+  id          Int              @id @default(autoincrement())
+  name        String           @unique @db.VarChar(250)
+  slug        String           @unique @db.VarChar(250)
+  description String?          @db.VarChar(500)
   igdb_id     Int?
-  gamecover   String       @db.VarChar(800)
-  Collection  Collection[]
+  gamecover   String           @db.VarChar(800)
+  website     String?          @db.VarChar(250)
+  patchNotes  String?          @db.VarChar(250)
+  screenshots GameScreenshot[]
+  collection  Collection[]
+  videos      GameVideo[]
+  platforms   GamePlatform[]
+}
+
+model GameScreenshot {
+  id      Int     @id @default(autoincrement())
+  caption String? @unique @db.VarChar(50)
+  url     String  @db.VarChar()
+  game    Game    @relation(fields: [gameId], references: [id])
+  gameId  Int
+}
+
+model GameVideo {
+  id      Int     @id @default(autoincrement())
+  caption String? @db.VarChar()
+  url     String  @db.VarChar()
+  game    Game    @relation(fields: [gameId], references: [id])
+  gameId  Int
+}
+
+model GamePlatform {
+  id         Int       @id @default(autoincrement())
+  name       Platform  @relation(fields: [platformId], references: [id])
+  release    DateTime? @db.Date()
+  game       Game      @relation(fields: [gameId], references: [id])
+  gameId     Int
+  platformId Int
+}
+
+model Platform {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(150)
+  gamePlatform GamePlatform[]
 }

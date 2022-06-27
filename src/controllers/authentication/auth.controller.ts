@@ -52,10 +52,14 @@ class AuthController extends BaseController {
 
       // get the data from req.body
       let user: AuthSignInDTO = req.body;
+
       // Check if user exists
-      const userExists: boolean = await this.userService.findOneByEmail(
+      const userExists: boolean = (await this.userService.findOneByEmail(
         user.email.trim()
-      );
+      ))
+        ? true
+        : false;
+
       if (!userExists) throw new Error("User doesn't exists", 400);
 
       const userWithToken: any = await this.authService.signIn(user);

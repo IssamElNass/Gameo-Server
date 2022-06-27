@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 const hashedPassword = bcrypt.hashSync("test", 14);
@@ -24,6 +24,16 @@ const statusses: string[] = [
   "Beaten",
   "Completed",
   "Quit",
+];
+
+const platforms: string[] = [
+  "PS5",
+  "PS4",
+  "PS3",
+  "PC",
+  "Xbox One",
+  "Nintendo Switch",
+  "Xbox Series X|S",
 ];
 
 const users: User[] = [
@@ -62,6 +72,17 @@ async function main() {
       create: {
         name: name,
         description: "",
+      },
+    });
+  });
+
+  // Create platforms
+  platforms.forEach(async (name) => {
+    await prisma.platform.create({
+      where: { name: name },
+      update: {},
+      create: {
+        name: name,
       },
     });
   });

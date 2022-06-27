@@ -40,8 +40,48 @@ CREATE TABLE "Game" (
     "description" VARCHAR(500),
     "igdb_id" INTEGER,
     "gamecover" VARCHAR(800) NOT NULL,
+    "website" VARCHAR(250),
+    "patchNotes" VARCHAR(250),
 
     CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GameScreenshot" (
+    "id" SERIAL NOT NULL,
+    "caption" VARCHAR(50),
+    "url" VARCHAR NOT NULL,
+    "gameId" INTEGER NOT NULL,
+
+    CONSTRAINT "GameScreenshot_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GameVideo" (
+    "id" SERIAL NOT NULL,
+    "caption" VARCHAR,
+    "url" VARCHAR NOT NULL,
+    "gameId" INTEGER NOT NULL,
+
+    CONSTRAINT "GameVideo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "GamePlatform" (
+    "id" SERIAL NOT NULL,
+    "release" DATE,
+    "gameId" INTEGER NOT NULL,
+    "platformId" INTEGER NOT NULL,
+
+    CONSTRAINT "GamePlatform_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Platform" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(150) NOT NULL,
+
+    CONSTRAINT "Platform_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -59,6 +99,9 @@ CREATE UNIQUE INDEX "Game_name_key" ON "Game"("name");
 -- CreateIndex
 CREATE UNIQUE INDEX "Game_slug_key" ON "Game"("slug");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "GameScreenshot_caption_key" ON "GameScreenshot"("caption");
+
 -- AddForeignKey
 ALTER TABLE "Collection" ADD CONSTRAINT "Collection_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -67,3 +110,15 @@ ALTER TABLE "Collection" ADD CONSTRAINT "Collection_statusId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Collection" ADD CONSTRAINT "Collection_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GameScreenshot" ADD CONSTRAINT "GameScreenshot_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GameVideo" ADD CONSTRAINT "GameVideo_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GamePlatform" ADD CONSTRAINT "GamePlatform_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GamePlatform" ADD CONSTRAINT "GamePlatform_platformId_fkey" FOREIGN KEY ("platformId") REFERENCES "Platform"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
