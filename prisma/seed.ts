@@ -11,10 +11,14 @@ interface User {
   password: string;
 }
 
-interface Game {
-  name: string;
-  slug: string;
-  gamecover: string;
+interface GamePlatform {
+  platformId: number;
+  release: Date;
+}
+
+interface Media {
+  caption: string | null;
+  url: string;
 }
 
 // Variables
@@ -78,13 +82,30 @@ async function main() {
     });
   });
 
+  // Create games
   data.games.forEach(async (game) => {
-    const screenshts: Prisma.GameScreenshotCreateInput[];
+    let screenshts: Media[] = [];
+    let video: Media[] = [];
+    let releases: GamePlatform[] = [];
 
     game.screenshots.forEach((sc) => {
       screenshts.push({
         caption: null,
         url: sc,
+      });
+    });
+
+    game.videos.forEach((v) => {
+      video.push({
+        caption: null,
+        url: v,
+      });
+    });
+
+    game.platforms.forEach((v) => {
+      releases.push({
+        release: v.release,
+        platformId: v.platform_id,
       });
     });
 
@@ -102,33 +123,15 @@ async function main() {
         screenshots: {
           create: screenshts,
         },
+        videos: {
+          create: video,
+        },
+        platforms: {
+          create: releases,
+        },
       },
     });
   });
-
-  // Create games
-
-  // Create two Users
-  //   collection: {
-  //     create: [
-  //       {
-  //         game: {
-  //           connect: { id: sifu.id },
-  //         },
-  //         status: {
-  //           connect: { id: beaten.id },
-  //         },
-  //       },
-  //       {
-  //         game: {
-  //           connect: { id: tlou.id },
-  //         },
-  //         status: {
-  //           connect: { id: backlog.id },
-  //         },
-  //       },
-  //     ],
-  //   },
 }
 
 main()

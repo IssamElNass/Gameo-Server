@@ -23,15 +23,15 @@ class BaseController implements Controller {
         else this.router.get(fullUrl, func);
         break;
       case "POST":
-        if (middelwares) this.router.get(fullUrl, middelwares, func);
+        if (middelwares) this.router.post(fullUrl, middelwares, func);
         else this.router.post(fullUrl, func);
         break;
       case "PATCH":
-        if (middelwares) this.router.get(fullUrl, middelwares, func);
+        if (middelwares) this.router.patch(fullUrl, middelwares, func);
         else this.router.patch(fullUrl, func);
         break;
       case "DELETE":
-        if (middelwares) this.router.get(fullUrl, middelwares, func);
+        if (middelwares) this.router.delete(fullUrl, middelwares, func);
         else this.router.delete(fullUrl, func);
         break;
       default:

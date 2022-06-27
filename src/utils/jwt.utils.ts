@@ -15,7 +15,7 @@ export function generateToken(userId: string, username: string): string {
   if (process.env.TOKEN_SECRET) privateKey = process.env.TOKEN_SECRET;
 
   const signInOptions: SignOptions = {
-    expiresIn: "1h",
+    expiresIn: "24h",
   };
 
   // generate JWT
@@ -28,8 +28,6 @@ export function verifyToken(token: string): PayloadDTO {
     token,
     process.env.TOKEN_SECRET as string,
     (err: any, data: any) => {
-      console.log(err);
-
       payload = {
         userId: data.userId,
         username: data.username,
