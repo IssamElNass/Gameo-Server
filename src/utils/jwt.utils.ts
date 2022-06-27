@@ -15,7 +15,7 @@ export function generateToken(userId: string, username: string): string {
   if (process.env.TOKEN_SECRET) privateKey = process.env.TOKEN_SECRET;
 
   const signInOptions: SignOptions = {
-    expiresIn: "1h",
+    expiresIn: "24h",
   };
 
   // generate JWT
