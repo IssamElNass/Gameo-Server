@@ -82,6 +82,7 @@ async function main() {
     });
   });
 
+  // Create games
   data.games.forEach(async (game) => {
     let screenshts: Media[] = [];
     let video: Media[] = [];
@@ -131,30 +132,6 @@ async function main() {
       },
     });
   });
-
-  // Create games
-
-  // Create two Users
-  //   collection: {
-  //     create: [
-  //       {
-  //         game: {
-  //           connect: { id: sifu.id },
-  //         },
-  //         status: {
-  //           connect: { id: beaten.id },
-  //         },
-  //       },
-  //       {
-  //         game: {
-  //           connect: { id: tlou.id },
-  //         },
-  //         status: {
-  //           connect: { id: backlog.id },
-  //         },
-  //       },
-  //     ],
-  //   },
 }
 
 main()

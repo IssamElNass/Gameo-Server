@@ -1,7 +1,7 @@
 import { Pool } from "pg";
+import { PrismaClient } from "@prisma/client";
 import Service from "../interfaces/service";
 import DB from "../config/dbconfig";
-import { PrismaClient } from "@prisma/client";
 
 class BaseService implements Service {
   public db: Pool;

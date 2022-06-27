@@ -27,6 +27,7 @@ export default function isAuthenticated(
     process.env.TOKEN_SECRET as string,
     (err: any, user: any) => {
       if (err) throw new Error("Forbidden", 403);
+      console.log("done");
 
       next();
     }

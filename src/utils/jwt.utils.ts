@@ -28,8 +28,6 @@ export function verifyToken(token: string): PayloadDTO {
     token,
     process.env.TOKEN_SECRET as string,
     (err: any, data: any) => {
-      console.log(err);
-
       payload = {
         userId: data.userId,
         username: data.username,
