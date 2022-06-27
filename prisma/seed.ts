@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
+import data from "./games";
 const prisma = new PrismaClient();
 const hashedPassword = bcrypt.hashSync("test", 14);
 
@@ -42,27 +43,6 @@ const users: User[] = [
   { username: "yor", email: "yor@gameo.io", password: hashedPassword },
 ];
 
-const games: Game[] = [
-  {
-    name: "Sifu",
-    slug: "sifu",
-    gamecover:
-      "https://d2d2z3qzqjizpf.cloudfront.net/eyJidWNrZXQiOiJnZ2FwcCIsImtleSI6Im1lZGlhL2dhbWVzL2tSQ3NVUi8wZmJjNjM1YS1lMjNkLTQzMmEtYjE4Ni0yOTcwMDk1MTBkOTMuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJjaHJvbWFTdWJzYW1wbGluZyI6IjQ6NDo0In0sInJlc2l6ZSI6eyJ3aWR0aCI6MzA3fX19",
-  },
-  {
-    name: "The Last Of Us Part 1",
-    slug: "the-last-of-us-part-1",
-    gamecover:
-      "https://d2d2z3qzqjizpf.cloudfront.net/eyJidWNrZXQiOiJnZ2FwcCIsImtleSI6Im1lZGlhL2dhbWVzL1Y2S29uMi8yNzIxMzY1ZC1kZmYyLTRkYmYtYjhlMi1hNTFkZmIzNTcyYTcuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJjaHJvbWFTdWJzYW1wbGluZyI6IjQ6NDo0In0sInJlc2l6ZSI6eyJ3aWR0aCI6MzA3fX19",
-  },
-  {
-    name: "Flintlock: The Siege of Dawn",
-    slug: "flintlock-the-siege-of-dawn",
-    gamecover:
-      "https://d2d2z3qzqjizpf.cloudfront.net/eyJidWNrZXQiOiJnZ2FwcCIsImtleSI6Im1lZGlhL2dhbWVzL210Y2VHcy8yYzkzOGQyZi00ZGNjLTQ1YjMtODQwYi04MDUxODM1YmMwMWQuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJqcGciLCJqcGVnIjp7InF1YWxpdHkiOjgwLCJjaHJvbWFTdWJzYW1wbGluZyI6IjQ6NDo0In0sInJlc2l6ZSI6eyJ3aWR0aCI6MzA3fX19",
-  },
-];
-
 async function main() {
   // Create play statusses
   statusses.forEach(async (name) => {
@@ -79,9 +59,7 @@ async function main() {
   // Create platforms
   platforms.forEach(async (name) => {
     await prisma.platform.create({
-      where: { name: name },
-      update: {},
-      create: {
+      data: {
         name: name,
       },
     });
@@ -100,8 +78,16 @@ async function main() {
     });
   });
 
-  // Create games
-  games.forEach(async (game) => {
+  data.games.forEach(async (game) => {
+    const screenshts: Prisma.GameScreenshotCreateInput[];
+
+    game.screenshots.forEach((sc) => {
+      screenshts.push({
+        caption: null,
+        url: sc,
+      });
+    });
+
     await prisma.game.upsert({
       where: { slug: game.slug },
       update: {},
@@ -109,9 +95,18 @@ async function main() {
         name: game.name,
         slug: game.slug,
         gamecover: game.gamecover,
+        description: game.description,
+        igdb_id: game.igdb_id,
+        website: game.website,
+        patchNotes: game.patchNotes,
+        screenshots: {
+          create: screenshts,
+        },
       },
     });
   });
+
+  // Create games
 
   // Create two Users
   //   collection: {
