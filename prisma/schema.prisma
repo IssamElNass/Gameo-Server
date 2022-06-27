@@ -42,13 +42,13 @@ model Status {
 
 model Game {
   id          Int              @id @default(autoincrement())
-  name        String           @unique @db.VarChar(250)
-  slug        String           @unique @db.VarChar(250)
-  description String?          @db.VarChar(500)
+  name        String           @unique @db.VarChar(850)
+  slug        String           @unique @db.VarChar(850)
+  description String?          @db.VarChar(850)
   igdb_id     Int?
   gamecover   String           @db.VarChar(800)
-  website     String?          @db.VarChar(250)
-  patchNotes  String?          @db.VarChar(250)
+  website     String?          @db.VarChar(850)
+  patchNotes  String?          @db.VarChar(850)
   screenshots GameScreenshot[]
   collection  Collection[]
   videos      GameVideo[]
