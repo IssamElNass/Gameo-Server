@@ -6,11 +6,7 @@ import {
   AuthSignInDTO,
   PayloadDTO,
 } from "../../model/auth.model";
-import {
-  generateToken,
-  verifyToken,
-  verifyRefreshToken,
-} from "../../utils/jwt.utils";
+import { generateTokens, verifyToken } from "../../utils/jwt.utils";
 import { Error } from "../../model/error.model";
 
 class AuthService extends BaseService {

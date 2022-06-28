@@ -1,89 +1,71 @@
-import { sign, SignOptions, verify, decode } from "jsonwebtoken";
-import { PayloadDTO } from "../model/auth.model";
+import { sign, SignOptions, verify } from "jsonwebtoken";
+import { PayloadDTO, Tokens } from "../model/auth.model";
+import { Error } from "../model/error.model";
+
+const accessOptions: SignOptions = {
+  expiresIn: "15m",
+};
+
+const refreshOptions: SignOptions = {
+  expiresIn: "7d",
+};
 
 /**
- * generates JWT
+ * Generates an access_token and a refresh token
+ * @param {PayloadDTO} payload - The payload that contains the userId and username
+ * @return {Tokens} Return the access and refresh token
+ * @example
+ * const payload: PayloadDTO = {username: 'bondi', userId: '4698d7e5-42f7-441c-a068-6619ec23bbb6'};
+ * generateTokens(payload)
  */
-export function generateToken(
-  userId: string,
-  username: string
-): {
-  access_token: string;
-  refresh_token: string;
-} {
-  // information to be encoded in the JWT
-  const payload: PayloadDTO = {
-    username: username,
-    userId: userId,
-  };
-  // read private key value
-  let privateTokenKey: string = "";
-  if (process.env.TOKEN_SECRET) privateTokenKey = process.env.TOKEN_SECRET;
+export function generateTokens(payload: PayloadDTO): Tokens {
+  // read private key tokens
+  let privateAccessTokenKey: string = process.env.TOKEN_SECRET
+    ? process.env.TOKEN_SECRET
+    : "";
+  if (!privateAccessTokenKey || privateAccessTokenKey === "")
+    throw new Error("Private Access Token key is empty");
 
-  let privateRefreshKey: string = "";
-  if (process.env.REFRESH_SECRET)
-    privateRefreshKey = process.env.REFRESH_SECRET;
+  let privateRefreshTokenKey: string = process.env.REFRESH_SECRET
+    ? process.env.REFRESH_SECRET
+    : "";
+  if (!privateRefreshTokenKey || privateRefreshTokenKey === "")
+    throw new Error("Private Refresh Token key is empty");
 
-  const signInOptions: SignOptions = {
-    expiresIn: "15m",
-  };
-
-  const refreshOptions: SignOptions = {
-    expiresIn: "7d",
-  };
-
-  const access_token: string = sign(payload, privateTokenKey, signInOptions);
+  // Sign the two keys
+  const access_token: string = sign(
+    payload,
+    privateAccessTokenKey,
+    accessOptions
+  );
   const refresh_token: string = sign(
     payload,
-    privateRefreshKey,
+    privateRefreshTokenKey,
     refreshOptions
   );
 
-  // generate JWT
   return {
     access_token: access_token,
     refresh_token: refresh_token,
   };
 }
 
-export function verifyToken(token: string): PayloadDTO {
-  let payload: PayloadDTO;
-  let data: any = verify(
-    token,
-    process.env.TOKEN_SECRET as string,
-    (err: any, data: any) => {
-      payload = {
-        userId: data.userId,
-        username: data.username,
-      };
-      if (err) console.error("ERROR");
-      return data;
-    }
-  );
-  payload = {
-    userId: data.userId,
-    username: data.username,
-  };
-  return payload;
-}
+/**
+ * Verifies a token
+ * @param {string} token - The access or refresh token
+ * @param {string} secret - The private/secret key
+ * @return {PayloadDTO} Return the payload
+ * @example
+ * generateTokens(token, secret)
+ */
+export function verifyToken(token: string, secret: string): PayloadDTO {
+  let payload: any = verify(token, secret, (err: any, data: any) => {
+    if (err) throw new Error(err);
+    return {
+      userId: data.userId,
+      username: data.username,
+    };
+  });
 
-export function verifyRefreshToken(token: string): PayloadDTO {
-  let payload: PayloadDTO;
-  let data: any = verify(
-    token,
-    process.env.REFRESH_SECRET as string,
-    (err: any, data: any) => {
-      payload = {
-        userId: data.userId,
-        username: data.username,
-      };
-      if (err) console.error("ERROR");
-      return data;
-    }
-  );
-  payload = {
-    userId: data.userId,
-    username: data.username,
-  };
-  return payload;
+  return payload as PayloadDTO;
 }
