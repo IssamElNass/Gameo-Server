@@ -28,8 +28,16 @@ export function generateToken(
     expiresIn: "15m",
   };
 
+  const refreshOptions: SignOptions = {
+    expiresIn: "7d",
+  };
+
   const access_token: string = sign(payload, privateTokenKey, signInOptions);
-  const refresh_token: string = sign(payload, privateRefreshKey, signInOptions);
+  const refresh_token: string = sign(
+    payload,
+    privateRefreshKey,
+    refreshOptions
+  );
 
   // generate JWT
   return {
@@ -40,7 +48,7 @@ export function generateToken(
 
 export function verifyToken(token: string): PayloadDTO {
   let payload: PayloadDTO;
-  let test: any = verify(
+  let data: any = verify(
     token,
     process.env.TOKEN_SECRET as string,
     (err: any, data: any) => {
@@ -53,8 +61,29 @@ export function verifyToken(token: string): PayloadDTO {
     }
   );
   payload = {
-    userId: test.userId,
-    username: test.username,
+    userId: data.userId,
+    username: data.username,
+  };
+  return payload;
+}
+
+export function verifyRefreshToken(token: string): PayloadDTO {
+  let payload: PayloadDTO;
+  let data: any = verify(
+    token,
+    process.env.REFRESH_SECRET as string,
+    (err: any, data: any) => {
+      payload = {
+        userId: data.userId,
+        username: data.username,
+      };
+      if (err) console.error("ERROR");
+      return data;
+    }
+  );
+  payload = {
+    userId: data.userId,
+    username: data.username,
   };
   return payload;
 }

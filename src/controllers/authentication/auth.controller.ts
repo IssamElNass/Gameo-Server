@@ -17,6 +17,7 @@ class AuthController extends BaseController {
   public intializeRoutes() {
     this.setPostRoute({ func: this.registerNewUser, path: "/register" });
     this.setPostRoute({ func: this.signIn, path: "/signin" });
+    this.setPostRoute({ func: this.refreshToken, path: "/refresh" });
   }
 
   public registerNewUser = async (
@@ -75,6 +76,30 @@ class AuthController extends BaseController {
       // return response
       return res.status(200).json({
         data: userWithToken,
+      });
+    } catch (error: any) {
+      next(new Error(error.message, error.status));
+    }
+  };
+
+  public refreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      if (Object.keys(req.body).length !== 1)
+        throw new Error("Issue with the request body", 400);
+
+      // get the data from req.body
+      let refresh_token: string = req.body.token;
+
+      const tokens: any = await this.authService.refreshToken(refresh_token);
+
+      if (!tokens) throw new Error("Please sign in again", 403);
+      // return response
+      return res.status(200).json({
+        data: tokens,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));
