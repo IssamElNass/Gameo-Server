@@ -13,7 +13,10 @@ class AuthService extends BaseService {
     super();
   }
 
-  public async registerUser(registerUser: AuthRegisterDTO): Promise<string> {
+  public async registerUser(registerUser: AuthRegisterDTO): Promise<{
+    access_token: string;
+    refresh_token: string;
+  }> {
     const hashedPassword = bcrypt.hashSync(registerUser.password, 14);
     let user: Prisma.UserCreateInput = {
       email: registerUser.email,
@@ -23,10 +26,13 @@ class AuthService extends BaseService {
 
     const createdUser = await this.prismaClient.user.create({ data: user });
     // Create the jwt token
-    const token: string = generateToken(createdUser.id, createdUser.username);
+    const tokens: {
+      access_token: string;
+      refresh_token: string;
+    } = generateToken(createdUser.id, createdUser.username);
 
     // return the token
-    return token;
+    return tokens;
   }
 
   public async signIn(user: AuthSignInDTO): Promise<any> {
@@ -38,8 +44,13 @@ class AuthService extends BaseService {
       (await bcrypt.compare(user.password, foundUser.password))
     ) {
       // Create token
-      const token: string = generateToken(foundUser.id, foundUser.username);
-      foundUser.token = token;
+      const tokens: {
+        access_token: string;
+        refresh_token: string;
+      } = generateToken(foundUser.id, foundUser.username);
+      foundUser.access_token = tokens.access_token;
+      foundUser.refresh_token = tokens.refresh_token;
+
       return foundUser;
     }
     // return the token

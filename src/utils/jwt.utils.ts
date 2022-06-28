@@ -4,22 +4,38 @@ import { PayloadDTO } from "../model/auth.model";
 /**
  * generates JWT
  */
-export function generateToken(userId: string, username: string): string {
+export function generateToken(
+  userId: string,
+  username: string
+): {
+  access_token: string;
+  refresh_token: string;
+} {
   // information to be encoded in the JWT
   const payload: PayloadDTO = {
     username: username,
     userId: userId,
   };
   // read private key value
-  let privateKey: string = "";
-  if (process.env.TOKEN_SECRET) privateKey = process.env.TOKEN_SECRET;
+  let privateTokenKey: string = "";
+  if (process.env.TOKEN_SECRET) privateTokenKey = process.env.TOKEN_SECRET;
+
+  let privateRefreshKey: string = "";
+  if (process.env.REFRESH_SECRET)
+    privateRefreshKey = process.env.REFRESH_SECRET;
 
   const signInOptions: SignOptions = {
-    expiresIn: "24h",
+    expiresIn: "15m",
   };
 
+  const access_token: string = sign(payload, privateTokenKey, signInOptions);
+  const refresh_token: string = sign(payload, privateRefreshKey, signInOptions);
+
   // generate JWT
-  return sign(payload, privateKey, signInOptions);
+  return {
+    access_token: access_token,
+    refresh_token: refresh_token,
+  };
 }
 
 export function verifyToken(token: string): PayloadDTO {

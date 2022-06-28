@@ -34,11 +34,14 @@ class AuthController extends BaseController {
       // Check if username / email is already linked with a user
       await this.userService.checkIfUserExists(user.username, user.email);
 
-      const token: string = await this.authService.registerUser(user);
+      const tokens: {
+        access_token: string;
+        refresh_token: string;
+      } = await this.authService.registerUser(user);
 
       // return response
       return res.status(200).json({
-        auth_token: token,
+        tokens,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));
@@ -71,7 +74,7 @@ class AuthController extends BaseController {
         );
       // return response
       return res.status(200).json({
-        auth_token: userWithToken.token,
+        data: userWithToken,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));
