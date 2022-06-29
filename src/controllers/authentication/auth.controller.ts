@@ -1,7 +1,7 @@
 import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
 import AuthService from "../../services/auth/auth.service";
-import { AuthRegisterDTO, AuthSignInDTO } from "../../model/auth.model";
+import { AuthRegisterDTO, AuthSignInDTO, Tokens } from "../../model/auth.model";
 import UserService from "../../services/user/user.service";
 import { Error } from "../../model/error.model";
 
@@ -26,7 +26,7 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length < 2)
+      if (Object.keys(req.body).length !== 3)
         throw new Error("Issue with the request body", 400);
 
       // get the data from req.body
@@ -35,10 +35,7 @@ class AuthController extends BaseController {
       // Check if username / email is already linked with a user
       await this.userService.checkIfUserExists(user.username, user.email);
 
-      const tokens: {
-        access_token: string;
-        refresh_token: string;
-      } = await this.authService.registerUser(user);
+      const tokens: Tokens = await this.authService.registerUser(user);
 
       // return response
       return res.status(200).json({
