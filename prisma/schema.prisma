@@ -23,6 +23,12 @@ model User {
   collection      Collection[]
 }
 
+model Token {
+  token      String   @id @unique @db.VarChar()
+  expires_at DateTime
+  userId     String   @unique
+}
+
 model Collection {
   id       Int     @id @default(autoincrement())
   status   Status  @relation(fields: [statusId], references: [id])
