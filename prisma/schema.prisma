@@ -59,6 +59,7 @@ model Game {
   collection  Collection[]
   videos      GameVideo[]
   platforms   GamePlatform[]
+  genres      Genre[]
 }
 
 model GameScreenshot {
@@ -90,4 +91,12 @@ model Platform {
   id           Int            @id @default(autoincrement())
   name         String         @db.VarChar(150)
   gamePlatform GamePlatform[]
+}
+
+model Genre {
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar()
+  slug    String @db.VarChar()
+  igdb_id Int?
+  Game    Game[]
 }

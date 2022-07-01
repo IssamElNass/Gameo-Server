@@ -57,8 +57,6 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      console.log(req.query);
-
       if (Object.keys(req.query).length !== 1)
         throw new Error("Issue with the query", 400);
 
