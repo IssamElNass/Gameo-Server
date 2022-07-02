@@ -89,8 +89,18 @@ model GamePlatform {
 
 model Platform {
   id           Int            @id @default(autoincrement())
-  name         String         @db.VarChar(150)
+  name         String         @db.VarChar()
+  slug         String         @db.VarChar()
+  igdb_id      Int?
   gamePlatform GamePlatform[]
+}
+
+model Company {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar()
+  description String @db.VarChar()
+  slug        String @db.VarChar()
+  igdb_id     Int?
 }
 
 model Genre {
