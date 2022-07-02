@@ -23,17 +23,9 @@ class GameService extends BaseService {
             url: true,
           },
         },
-        platforms: {
-          select: {
-            release: true,
-            name: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
       },
+      skip: 1000,
+      take: 10,
     });
     return result;
   }
@@ -56,16 +48,6 @@ class GameService extends BaseService {
             id: true,
             caption: true,
             url: true,
-          },
-        },
-        platforms: {
-          select: {
-            release: true,
-            name: {
-              select: {
-                name: true,
-              },
-            },
           },
         },
       },

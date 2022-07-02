@@ -47,19 +47,20 @@ model Status {
 }
 
 model Game {
-  id          Int              @id @default(autoincrement())
-  name        String           @unique @db.VarChar(850)
-  slug        String           @unique @db.VarChar(850)
-  description String?          @db.VarChar(850)
+  id          Int               @id @default(autoincrement())
+  name        String            @unique @db.VarChar()
+  slug        String            @unique @db.VarChar()
+  description String?           @db.VarChar()
   igdb_id     Int?
-  gamecover   String           @db.VarChar(800)
-  website     String?          @db.VarChar(850)
-  patchNotes  String?          @db.VarChar(850)
+  gamecover   String            @db.VarChar()
+  website     String?           @db.VarChar()
+  patchNotes  String?           @db.VarChar()
   screenshots GameScreenshot[]
   collection  Collection[]
   videos      GameVideo[]
   platforms   GamePlatform[]
   genres      Genre[]
+  companies   InvolvedCompany[]
 }
 
 model GameScreenshot {
@@ -79,12 +80,13 @@ model GameVideo {
 }
 
 model GamePlatform {
-  id         Int       @id @default(autoincrement())
-  name       Platform  @relation(fields: [platformId], references: [id])
-  release    DateTime? @db.Date()
-  game       Game      @relation(fields: [gameId], references: [id])
-  gameId     Int
-  platformId Int
+  id             Int       @id @default(autoincrement())
+  platform       Platform  @relation(fields: [platformId], references: [id])
+  release_date   DateTime? @db.Date()
+  release_string String    @db.VarChar()
+  game           Game      @relation(fields: [gameId], references: [id])
+  gameId         Int
+  platformId     Int
 }
 
 model Platform {
@@ -96,11 +98,23 @@ model Platform {
 }
 
 model Company {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar()
-  description String @db.VarChar()
-  slug        String @db.VarChar()
-  igdb_id     Int?
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar()
+  description     String            @db.VarChar()
+  slug            String            @db.VarChar()
+  igdb_id         Int
+  InvolvedCompany InvolvedCompany[]
+}
+
+model InvolvedCompany {
+  id        Int      @id @default(autoincrement())
+  developer Boolean
+  publisher Boolean
+  igdb_id   Int?
+  Game      Game?    @relation(fields: [gameId], references: [id])
+  gameId    Int?
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int?
 }
 
 model Genre {
