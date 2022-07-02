@@ -23,6 +23,18 @@ class GameService extends BaseService {
             url: true,
           },
         },
+        companies: {
+          select: {
+            developer: true,
+            publisher: true,
+            Company: {
+              select: {
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
       },
       skip: 1000,
       take: 10,

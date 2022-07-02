@@ -140,7 +140,7 @@ async function getGames(offset: number = 0) {
     // 👇️ const data: GetUsersResponse
     const { data } = await axios.post<any>(
       "https://api.igdb.com/v4/games",
-      `fields id, involved_companies,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;where category = 0 & platforms = 48;limit 500;offset ${offset};`,
+      `fields id, involved_companies.*,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;limit 500;offset ${offset};`,
       {
         headers: {
           "Client-ID": process.env.IGDB_CLIENTID as string,
@@ -149,7 +149,7 @@ async function getGames(offset: number = 0) {
         },
       }
     );
-    console.log(data);
+    //console.log(data);
 
     return data;
   } catch (error) {
@@ -270,7 +270,7 @@ async function setGames() {
 
     if (resultGames.length <= 0) clearInterval(interval);
     else {
-      console.log(resultGames);
+      //console.log(resultGames);
 
       resultGames.forEach(async (game: any) => {
         let screenshts: Media[] = [];
@@ -296,28 +296,43 @@ async function setGames() {
         }
 
         if (game.involved_companies) {
-          game.involved_companies.forEach((v: any) => {
+          game.involved_companies.forEach((ic: any) => {
             involcedCompanies.push({
-              id: v,
+              igdb_id: ic.id,
+              developer: ic.developer,
+              publisher: ic.publisher,
+              companyId: ic.company ? ic.company : null,
             });
           });
         }
 
-        await prisma.game.create({
-          data: {
-            name: game.name,
-            slug: game.slug,
-            igdb_id: game.id,
-            description: game.summary ? game.summary : "",
-            gamecover: game.cover ? generateImageUrl(game.cover.image_id) : "",
-            screenshots: {
-              create: screenshts,
+        try {
+          await prisma.game.create({
+            data: {
+              name: game.name,
+              slug: game.slug,
+              igdb_id: game.id,
+              description: game.summary ? game.summary : "",
+              gamecover: game.cover
+                ? generateImageUrl(game.cover.image_id)
+                : "",
+              screenshots: {
+                create: screenshts,
+              },
+              videos: {
+                create: video,
+              },
+              companies: {
+                create: involcedCompanies,
+              },
             },
-            videos: {
-              create: video,
-            },
-          },
-        });
+          });
+        } catch (error) {
+          console.error(error);
+          console.log(involcedCompanies);
+          console.log(game);
+          throw error;
+        }
       });
 
       gamesCount = gamesCount + 500;
