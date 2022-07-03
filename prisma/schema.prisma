@@ -49,9 +49,9 @@ model Status {
 model Game {
   id          Int               @id @default(autoincrement())
   name        String            @db.VarChar()
-  slug        String            @unique @db.VarChar()
+  slug        String            @db.VarChar()
   description String?           @db.VarChar()
-  igdb_id     Int?              @unique
+  igdb_id     Int?
   gamecover   String            @db.VarChar()
   website     String?           @db.VarChar()
   patchNotes  String?           @db.VarChar()
@@ -102,18 +102,19 @@ model Company {
   name            String            @db.VarChar()
   description     String            @db.VarChar()
   slug            String            @unique @db.VarChar()
-  igdb_id         Int?
+  igdb_id         Int?              @unique
   InvolvedCompany InvolvedCompany[]
 }
 
 model InvolvedCompany {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   developer Boolean
   publisher Boolean
   igdb_id   Int?
-  Game      Game?     @relation(fields: [gameId], references: [id])
+  Game      Game?    @relation(fields: [gameId], references: [id])
   gameId    Int?
-  Company   Company[]
+  Company   Company? @relation(fields: [companyId], references: [igdb_id])
+  companyId Int?
 }
 
 model Genre {

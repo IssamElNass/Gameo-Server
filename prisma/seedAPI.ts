@@ -266,7 +266,6 @@ async function setGames() {
   let gamesCount = 0;
   const interval = setInterval(async () => {
     const resultGames: any = await getGames(gamesCount);
-    console.log(resultGames);
 
     if (resultGames.length <= 0) clearInterval(interval);
     else {
