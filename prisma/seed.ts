@@ -27,11 +27,6 @@ type User = {
   password: string;
 };
 
-interface GamePlatform {
-  platformId: number;
-  release: Date;
-}
-
 interface Media {
   caption: string | null;
   url: string;
@@ -140,7 +135,7 @@ async function getGames(offset: number = 0) {
     // 👇️ const data: GetUsersResponse
     const { data } = await axios.post<any>(
       "https://api.igdb.com/v4/games",
-      `fields id, involved_companies.*,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;where platforms = 167;limit 500;offset ${offset};`,
+      `fields id, involved_companies.*,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;limit 500;offset ${offset};`,
       {
         headers: {
           "Client-ID": process.env.IGDB_CLIENTID as string,
@@ -277,7 +272,8 @@ async function setGames() {
         let releases: any[] = [];
         let involcedCompanies: any[] = [];
         let genres: any[] = [];
-
+        let platforms: any[] = [];
+        let websites: any[] = [];
         if (game.screenshots) {
           game.screenshots.forEach((sc: any) => {
             screenshts.push({
@@ -291,6 +287,14 @@ async function setGames() {
           game.genres.forEach((g: any) => {
             genres.push({
               slug: g.slug,
+            });
+          });
+        }
+
+        if (game.platforms) {
+          game.platforms.forEach((pl: any) => {
+            platforms.push({
+              slug: pl.slug,
             });
           });
         }
@@ -322,6 +326,17 @@ async function setGames() {
               release_human: re.human,
               release_date: new Date(re.date * 1000).toString(),
               platformId: re.platform,
+              region: getRegionInString(re.region),
+            });
+          });
+        }
+
+        if (game.websites) {
+          game.websites.forEach((we: any) => {
+            websites.push({
+              type: getWebsiteType(we.category),
+              url: we.url,
+              igdb_id: we.id,
             });
           });
         }
@@ -349,7 +364,13 @@ async function setGames() {
                 connect: genres,
               },
               platforms: {
+                connect: platforms,
+              },
+              releases: {
                 create: releases,
+              },
+              game_websites: {
+                create: websites,
               },
             },
           });
@@ -368,6 +389,74 @@ async function setGames() {
 
 function generateImageUrl(imageId: string): string {
   return `https://images.igdb.com/igdb/image/upload/t_original/${imageId}.png`;
+}
+
+function getRegionInString(region: number): string {
+  switch (region) {
+    case 1:
+      return "EUROPE";
+    case 2:
+      return "NORTH_AMERICA";
+    case 3:
+      return "AUSTRALIA";
+    case 4:
+      return "NEW_ZEALAND";
+    case 5:
+      return "JAPAN";
+    case 6:
+      return "CHINA";
+    case 7:
+      return "ASIA";
+    case 8:
+      return "WORLDWIDE";
+    case 9:
+      return "KOREA";
+    case 10:
+      return "BRAZIL";
+    default:
+      return "WORLDWIDE";
+  }
+}
+
+function getWebsiteType(category: number): string {
+  switch (category) {
+    case 1:
+      return "OFFICIAL";
+    case 2:
+      return "WIKIA";
+    case 3:
+      return "WIKIPEDIA";
+    case 4:
+      return "FACEBOOK";
+    case 5:
+      return "TWITTER";
+    case 6:
+      return "TWITCH";
+    case 8:
+      return "INSTAGRAM";
+    case 9:
+      return "YOUTUBE";
+    case 10:
+      return "IPHONE";
+    case 11:
+      return "IPAD";
+    case 12:
+      return "ANDROID";
+    case 13:
+      return "STEAM";
+    case 14:
+      return "REDDIT";
+    case 15:
+      return "ITCH";
+    case 16:
+      return "EPICGAMES";
+    case 17:
+      return "GOG";
+    case 18:
+      return "DISCORD";
+    default:
+      return "WORLDWIDE";
+  }
 }
 
 async function main() {

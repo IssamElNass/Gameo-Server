@@ -8,7 +8,7 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "seed": "ts-node prisma/seedAPI.ts",
+    "seed": "ts-node prisma/seed.ts",
     "build": "rm -rf build/ && prettier --write src/ && tsc"
   },
   "keywords": [],
@@ -37,6 +37,6 @@
     "prisma": "^4.0.0"
   },
   "prisma": {
-    "seed": "ts-node prisma/seedAPI.ts"
+    "seed": "ts-node prisma/seed.ts"
   }
 }

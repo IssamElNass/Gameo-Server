@@ -27,7 +27,7 @@ class GameService extends BaseService {
           select: {
             developer: true,
             publisher: true,
-            Company: {
+            company: {
               select: {
                 name: true,
                 slug: true,
@@ -37,17 +37,24 @@ class GameService extends BaseService {
         },
         platforms: {
           select: {
-            release_human: true,
             id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        releases: {
+          select: {
+            region: true,
+            release_human: true,
             platform: {
               select: {
                 name: true,
+                slug: true,
               },
             },
           },
         },
       },
-      skip: 100,
       take: 10,
     });
     return result;
@@ -77,7 +84,7 @@ class GameService extends BaseService {
           select: {
             developer: true,
             publisher: true,
-            Company: {
+            company: {
               select: {
                 name: true,
                 slug: true,
@@ -85,19 +92,21 @@ class GameService extends BaseService {
             },
           },
         },
-        genres: {
+        platforms: {
           select: {
+            id: true,
             name: true,
             slug: true,
           },
         },
-        platforms: {
+        releases: {
           select: {
+            region: true,
             release_human: true,
-            id: true,
             platform: {
               select: {
                 name: true,
+                slug: true,
               },
             },
           },
@@ -121,7 +130,7 @@ class GameService extends BaseService {
 
       if (collectionResult) throw new Error("Log already exists");
 
-      const result: any = await this.prismaClient.collection.create({
+      const result: any = await this.prismaClient.log.create({
         data: {
           statusId: statusId,
           gameId: gameId,
@@ -138,7 +147,7 @@ class GameService extends BaseService {
     gameId: number,
     userId: string
   ): Promise<any> {
-    return await this.prismaClient.collection.findFirst({
+    return await this.prismaClient.log.findFirst({
       where: {
         gameId: gameId,
         userId: userId,
@@ -192,7 +201,7 @@ class GameService extends BaseService {
 
       if (!collectionResult) throw new Error("Log doesn't exists");
 
-      const result: any = await this.prismaClient.collection.update({
+      const result: any = await this.prismaClient.log.update({
         where: {
           id: collectionResult.id,
         },
