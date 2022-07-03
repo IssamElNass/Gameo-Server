@@ -80,20 +80,20 @@ model GameVideo {
 }
 
 model GamePlatform {
-  id             Int       @id @default(autoincrement())
-  platform       Platform  @relation(fields: [platformId], references: [id])
-  release_date   DateTime? @db.Date()
-  release_string String    @db.VarChar()
-  game           Game      @relation(fields: [gameId], references: [id])
-  gameId         Int
-  platformId     Int
+  id            Int      @id @default(autoincrement())
+  platform      Platform @relation(fields: [platformId], references: [igdb_id])
+  release_date  String?  @db.VarChar()
+  release_human String   @db.VarChar()
+  game          Game     @relation(fields: [gameId], references: [id])
+  gameId        Int
+  platformId    Int
 }
 
 model Platform {
   id           Int            @id @default(autoincrement())
   name         String         @db.VarChar()
   slug         String         @unique @db.VarChar()
-  igdb_id      Int?
+  igdb_id      Int?           @unique
   gamePlatform GamePlatform[]
 }
 

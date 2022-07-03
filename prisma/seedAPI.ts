@@ -140,7 +140,7 @@ async function getGames(offset: number = 0) {
     // 👇️ const data: GetUsersResponse
     const { data } = await axios.post<any>(
       "https://api.igdb.com/v4/games",
-      `fields id, involved_companies.*,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;limit 500;offset ${offset};`,
+      `fields id, involved_companies.*,release_dates.*, name, slug, genres.name, genres.slug, platforms.name, platforms.slug,storyline,summary, screenshots.image_id, videos.video_id,websites.url, websites.category, cover.image_id;where platforms = 167;limit 500;offset ${offset};`,
       {
         headers: {
           "Client-ID": process.env.IGDB_CLIENTID as string,
@@ -274,13 +274,23 @@ async function setGames() {
       resultGames.forEach(async (game: any) => {
         let screenshts: Media[] = [];
         let video: Media[] = [];
-        let releases: GamePlatform[] = [];
+        let releases: any[] = [];
         let involcedCompanies: any[] = [];
+        let genres: any[] = [];
+
         if (game.screenshots) {
           game.screenshots.forEach((sc: any) => {
             screenshts.push({
               caption: null,
               url: generateImageUrl(sc.image_id),
+            });
+          });
+        }
+
+        if (game.genres) {
+          game.genres.forEach((g: any) => {
+            genres.push({
+              slug: g.slug,
             });
           });
         }
@@ -304,6 +314,17 @@ async function setGames() {
             });
           });
         }
+        /*
+         */
+        if (game.release_dates) {
+          game.release_dates.forEach((re: any) => {
+            releases.push({
+              release_human: re.human,
+              release_date: new Date(re.date * 1000).toString(),
+              platformId: re.platform,
+            });
+          });
+        }
 
         try {
           await prisma.game.create({
@@ -323,6 +344,12 @@ async function setGames() {
               },
               companies: {
                 create: involcedCompanies,
+              },
+              genres: {
+                connect: genres,
+              },
+              platforms: {
+                create: releases,
               },
             },
           });

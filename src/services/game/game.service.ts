@@ -35,8 +35,19 @@ class GameService extends BaseService {
             },
           },
         },
+        platforms: {
+          select: {
+            release_human: true,
+            id: true,
+            platform: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
-      skip: 1000,
+      skip: 100,
       take: 10,
     });
     return result;
@@ -70,6 +81,23 @@ class GameService extends BaseService {
               select: {
                 name: true,
                 slug: true,
+              },
+            },
+          },
+        },
+        genres: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        platforms: {
+          select: {
+            release_human: true,
+            id: true,
+            platform: {
+              select: {
+                name: true,
               },
             },
           },
