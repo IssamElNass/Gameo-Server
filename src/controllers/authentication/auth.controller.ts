@@ -13,6 +13,11 @@ import {
   signUpValidator,
 } from "../../validators/auth";
 
+/**
+ * Authentication Controller
+ *
+ * Requests to sign the user up or in, refresh their token
+ */
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
   private userService: UserService = new UserService();
@@ -52,15 +57,12 @@ class AuthController extends BaseController {
         throw new Error(errors, 500);
       }
 
-      // get the data from req.body
       let user: AuthRegisterDTO = req.body;
 
-      // Check if username / email is already linked with a user
       await this.userService.checkIfUserExists(user.username, user.email);
 
       const tokens: Tokens = await this.authService.saveUser(user);
 
-      // return response
       return res.status(200).json({
         tokens,
       });
@@ -77,10 +79,8 @@ class AuthController extends BaseController {
         throw new Error(errors, 500);
       }
 
-      // get the data from req.body
       let user: AuthSignInDTO = req.body;
 
-      // Check if user exists
       const userExists: boolean = (await this.userService.getByEmail(
         user.email
       ))
@@ -89,16 +89,16 @@ class AuthController extends BaseController {
 
       if (!userExists) throw new Error("User doesn't exists", 400);
 
-      const userWithToken: any = await this.authService.signUserIn(user);
+      const tokens: Tokens | null = await this.authService.signUserIn(user);
 
-      if (!userWithToken)
+      if (!tokens)
         throw new Error(
           "Login failed, please check your e-mail and password",
           403
         );
       // return response
       return res.status(200).json({
-        data: userWithToken,
+        tokens,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));

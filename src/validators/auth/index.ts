@@ -25,3 +25,11 @@ export const refreshValidator: any[] = [
     .trim()
     .withMessage("token is not that short"),
 ];
+
+export const meValidator: any[] = [
+  header("authorization")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Bearer token must be provided"),
+];
