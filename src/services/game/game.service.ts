@@ -5,6 +5,7 @@ import {
   gameSingleByIdQuery,
   gameSingleBySlugQuery,
 } from "../../queries/games";
+import { GamesFilter } from "../../model/game.model";
 
 /*
 / Get
@@ -29,8 +30,10 @@ class GameService extends BaseService {
    * @example
    * const games: any = getAll();
    */
-  public async getAll(): Promise<any> {
-    const result: any = await this.prismaClient.game.findMany(gameAllQuery());
+  public async getAll(filterOptions: GamesFilter): Promise<any> {
+    const result: any = await this.prismaClient.game.findMany(
+      gameAllQuery(filterOptions)
+    );
     return result;
   }
 

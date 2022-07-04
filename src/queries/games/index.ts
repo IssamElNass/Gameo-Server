@@ -1,4 +1,6 @@
-export const gameAllQuery = (): any => {
+import { GamesFilter } from "../../model/game.model";
+
+export const gameAllQuery = (filterOptions: GamesFilter): any => {
   return {
     include: {
       screenshots: {
@@ -47,7 +49,8 @@ export const gameAllQuery = (): any => {
         },
       },
     },
-    take: 10,
+    skip: filterOptions.offset,
+    take: filterOptions.limit,
   };
 };
 

@@ -4,6 +4,12 @@ import GameService from "../../services/game/game.service";
 import { Error } from "../../model/error.model";
 import { isAuthenticated } from "../../middelware";
 import AuthService from "../../services/auth/auth.service";
+import {
+  getAllValidator,
+  getByIdValidator,
+  getBySlugValidator,
+} from "../../validators/game";
+import { GamesFilter } from "../../model/game.model";
 
 class GameController extends BaseController {
   private gameService: GameService = new GameService();
@@ -18,16 +24,16 @@ class GameController extends BaseController {
     this.setGetRoute({
       func: this.getAllGames,
       path: "/all",
-      validators: [],
+      validators: getAllValidator,
     });
-    // this.setGetRoute({
-    //   func: this.getGameById,
-    //   path: "/:id",
-    // });
+    this.setGetRoute({
+      func: this.getGameById,
+      validators: getByIdValidator,
+    });
     this.setGetRoute({
       func: this.getGameBySlug,
       path: "/:slug",
-      validators: [],
+      validators: getBySlugValidator,
     });
     // this.setPostRoute({
     //   func: this.setPlayStatusGame,
@@ -47,10 +53,19 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length > 0)
-        throw new Error("Issue with the request body", 400);
+      const errors = this.validator(req);
 
-      const games: any[] = await this.gameService.getAll();
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
+      console.log(req.query);
+
+      const filterOptions: GamesFilter = {
+        offset: Number(req.query.offset),
+        limit: Number(req.query.limit),
+      };
+
+      const games: any[] = await this.gameService.getAll(filterOptions);
 
       // return response
       return res.status(200).json({
@@ -68,11 +83,13 @@ class GameController extends BaseController {
   ) => {
     try {
       console.log(req);
+      const errors = this.validator(req);
 
-      if (Object.keys(req.params).length !== 1)
-        throw new Error("Issue with the query", 400);
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
 
-      const gameId: number = Number(req.params.id) || 0;
+      const gameId: number = Number(req.query.id) || 0;
       if (gameId === 0) throw new Error("Wrong Id", 400);
 
       const game: any = await this.gameService.getById(gameId);
@@ -92,8 +109,11 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.params).length !== 1)
-        throw new Error("Issue with the query", 400);
+      const errors = this.validator(req);
+
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
       //
       const gameSlug: string = req.params.slug || "";
       if (gameSlug === "") throw new Error("Wrong slug", 400);
