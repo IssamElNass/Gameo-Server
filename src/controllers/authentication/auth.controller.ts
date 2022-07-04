@@ -1,9 +1,12 @@
-import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import AuthService from "../../services/auth/auth.service";
+// Base Controller
+import BaseController from "../base.controller";
+// Services
+import { AuthService, UserService } from "../../services";
+// Models
 import { AuthRegisterDTO, AuthSignInDTO, Tokens } from "../../model/auth.model";
-import UserService from "../../services/user/user.service";
 import { Error } from "../../model/error.model";
+// Validators
 import {
   refreshValidator,
   signInValidator,
@@ -55,7 +58,7 @@ class AuthController extends BaseController {
       // Check if username / email is already linked with a user
       await this.userService.checkIfUserExists(user.username, user.email);
 
-      const tokens: Tokens = await this.authService.registerUser(user);
+      const tokens: Tokens = await this.authService.saveUser(user);
 
       // return response
       return res.status(200).json({
@@ -78,15 +81,15 @@ class AuthController extends BaseController {
       let user: AuthSignInDTO = req.body;
 
       // Check if user exists
-      const userExists: boolean = (await this.userService.findOneByEmail(
-        user.email.trim()
+      const userExists: boolean = (await this.userService.getByEmail(
+        user.email
       ))
         ? true
         : false;
 
       if (!userExists) throw new Error("User doesn't exists", 400);
 
-      const userWithToken: any = await this.authService.signIn(user);
+      const userWithToken: any = await this.authService.signUserIn(user);
 
       if (!userWithToken)
         throw new Error(

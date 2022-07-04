@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { validationResult } from "express-validator";
+import {
+  ResultFactory,
+  ValidationError,
+  validationResult,
+} from "express-validator";
 import Controller from "../interfaces/controller";
 
 class BaseController implements Controller {
   public apiUrl: string = "";
   public router: Router = Router();
-  public validator = validationResult;
+  public validator: ResultFactory<ValidationError> = validationResult;
+
   constructor(path: string) {
     this.apiUrl = path;
   }

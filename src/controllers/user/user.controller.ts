@@ -20,7 +20,7 @@ class UserController extends BaseController {
   }
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
-    const result: any = await this.userService.getAllUsers();
+    const result: any = await this.userService.getAll();
     return res.status(200).json({
       message: result,
     });

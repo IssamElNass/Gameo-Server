@@ -10,6 +10,13 @@ import {
 import { generateTokens, verifyToken } from "../../utils/jwt.utils";
 import { Error } from "../../model/error.model";
 
+/*
+/ Get
+/ Save
+/ Put
+/ Delete
+*/
+
 /**
  * This service takes care of the authentication.
  *
@@ -28,7 +35,7 @@ class AuthService extends BaseService {
    * const user: AuthRegisterDTO = {username: 'bondi', email: 'bondi@gameo.io', password: 'test'};
    * registerUser(user);
    */
-  public async registerUser(user: AuthRegisterDTO): Promise<Tokens> {
+  public async saveUser(user: AuthRegisterDTO): Promise<Tokens> {
     // Hash Password
     const hashedPassword = bcrypt.hashSync(user.password, 14);
 
@@ -75,7 +82,7 @@ class AuthService extends BaseService {
    * const userAuth: AuthSignInDTO = {email: 'bondi@gameo.io', password: 'test'};
    * signIn(user);
    */
-  public async signIn(userAuth: AuthSignInDTO): Promise<Tokens | null> {
+  public async signUserIn(userAuth: AuthSignInDTO): Promise<Tokens | null> {
     let foundUser: User = await this.getUserByEmail(userAuth.email);
 
     if (
@@ -160,35 +167,6 @@ class AuthService extends BaseService {
 
     // return the token
     return null;
-  }
-
-  /**
-   * Gets the user by using their access token
-   * @param {string} token - The access token
-   * @return {Promise<User>} Returns the found user
-   * @example
-   * getUserByToken("dsnkkdsnfkjndsfkndskjfndsk");
-   */
-  public async getUserByToken(token: string): Promise<User> {
-    const userDetails: PayloadDTO = verifyToken(
-      token,
-      process.env.TOKEN_SECRET as string
-    );
-    const result: any = await this.prismaClient.user.findUnique({
-      where: {
-        id: userDetails.userId,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        bio: true,
-        profile_picture: true,
-        role: true,
-        verified: true,
-      },
-    });
-    return result as User;
   }
 
   /**

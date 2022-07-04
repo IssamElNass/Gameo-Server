@@ -109,73 +109,73 @@ class GameController extends BaseController {
     }
   };
 
-  public setPlayStatusGame = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      console.log(req.body);
+  // public setPlayStatusGame = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     console.log(req.body);
 
-      if (Object.keys(req.body).length !== 2)
-        throw new Error("Issue with the body", 400);
+  //     if (Object.keys(req.body).length !== 2)
+  //       throw new Error("Issue with the body", 400);
 
-      const authHeader = req.headers["authorization"];
-      if (authHeader == null || authHeader == undefined)
-        throw new Error("Unauthorized", 401);
+  //     const authHeader = req.headers["authorization"];
+  //     if (authHeader == null || authHeader == undefined)
+  //       throw new Error("Unauthorized", 401);
 
-      const token: string = authHeader.split(" ")[1];
+  //     const token: string = authHeader.split(" ")[1];
 
-      const foundUser: any = await this.authService.getUserByToken(token);
-      console.log(foundUser);
+  //     const foundUser: any = await this.authService.getUserByToken(token);
+  //     console.log(foundUser);
 
-      const result: any = await this.gameService.addPlayStatusToGame(
-        req.body.gameId,
-        req.body.statusId,
-        foundUser.id
-      );
-      console.log(result);
-      return res.status(200).json({
-        data: result,
-      });
-    } catch (error: any) {
-      next(new Error(error.message, error.status));
-    }
-  };
+  //     const result: any = await this.gameService.addPlayStatusToGame(
+  //       req.body.gameId,
+  //       req.body.statusId,
+  //       foundUser.id
+  //     );
+  //     console.log(result);
+  //     return res.status(200).json({
+  //       data: result,
+  //     });
+  //   } catch (error: any) {
+  //     next(new Error(error.message, error.status));
+  //   }
+  // };
 
-  public updatePlayStatusGame = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      console.log(req.body);
+  // public updatePlayStatusGame = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction
+  // ) => {
+  //   try {
+  //     console.log(req.body);
 
-      if (Object.keys(req.body).length !== 2)
-        throw new Error("Issue with the body", 400);
+  //     if (Object.keys(req.body).length !== 2)
+  //       throw new Error("Issue with the body", 400);
 
-      const authHeader = req.headers["authorization"];
-      if (authHeader == null || authHeader == undefined)
-        throw new Error("Unauthorized", 401);
+  //     const authHeader = req.headers["authorization"];
+  //     if (authHeader == null || authHeader == undefined)
+  //       throw new Error("Unauthorized", 401);
 
-      const token: string = authHeader.split(" ")[1];
+  //     const token: string = authHeader.split(" ")[1];
 
-      const foundUser: any = await this.authService.getUserByToken(token);
-      console.log(foundUser);
+  //     const foundUser: any = await this.authService.getUserByToken(token);
+  //     console.log(foundUser);
 
-      const result: any = await this.gameService.updatePlayStatusToGame(
-        req.body.gameId,
-        req.body.statusId,
-        foundUser.id
-      );
-      console.log(result);
-      return res.status(200).json({
-        data: result,
-      });
-    } catch (error: any) {
-      next(new Error(error.message, error.status));
-    }
-  };
+  //     const result: any = await this.gameService.updatePlayStatusToGame(
+  //       req.body.gameId,
+  //       req.body.statusId,
+  //       foundUser.id
+  //     );
+  //     console.log(result);
+  //     return res.status(200).json({
+  //       data: result,
+  //     });
+  //   } catch (error: any) {
+  //     next(new Error(error.message, error.status));
+  //   }
+  // };
 }
 
 export default GameController;

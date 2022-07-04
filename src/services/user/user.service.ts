@@ -6,7 +6,7 @@ class UserService extends BaseService {
     super();
   }
 
-  public async getAllUsers(): Promise<any> {
+  public async getAll(): Promise<any> {
     const result: any = await this.prismaClient.user.findMany({
       select: {
         id: true,
@@ -20,7 +20,7 @@ class UserService extends BaseService {
   }
 
   // get one by email
-  public async findOneByEmail(email: string): Promise<any> {
+  public async getByEmail(email: string): Promise<any> {
     const result: any = await this.prismaClient.user.findUnique({
       where: {
         email: email,
@@ -32,7 +32,7 @@ class UserService extends BaseService {
     return result;
   }
   // get one by username
-  public async findOneByUsername(username: string): Promise<any> {
+  public async getByUsername(username: string): Promise<any> {
     const result: any = await this.prismaClient.user.findUnique({
       where: {
         username: username,
@@ -46,10 +46,10 @@ class UserService extends BaseService {
 
   public async checkIfUserExists(username: string, email: string) {
     try {
-      const resultUsername: any = await this.findOneByUsername(username);
+      const resultUsername: any = await this.getByUsername(username);
       if (resultUsername)
         throw new Error("Username already exists, please use another one");
-      const resultEmail: any = await this.findOneByEmail(email);
+      const resultEmail: any = await this.getByEmail(email);
       if (resultEmail)
         throw new Error(
           "Email is already linked with an account, please sign in"
