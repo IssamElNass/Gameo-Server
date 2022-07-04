@@ -53,7 +53,7 @@ class AuthService extends BaseService {
     // Create the access and refresh token
     const tokens: Tokens = generateTokens(payload);
 
-    const createdToken = await this.addTokenToDatabase(
+    const createdToken: Token = await this.addTokenToDatabase(
       createdUser,
       tokens.refresh_token
     );
@@ -90,11 +90,11 @@ class AuthService extends BaseService {
       // Create token
       const tokens: Tokens = generateTokens(payload);
 
-      const result = await this.prismaClient.token.findUnique({
+      const result: Token = (await this.prismaClient.token.findUnique({
         where: {
           userId: foundUser.id,
         },
-      });
+      })) as Token;
 
       if (result) {
         const updatedToken = await this.updateTokenInDatabase(
@@ -143,7 +143,6 @@ class AuthService extends BaseService {
         userId: payload.userId,
       },
     });
-    console.log(result);
 
     if (result && (await bcrypt.compare(token, result.token))) {
       // check expiry date

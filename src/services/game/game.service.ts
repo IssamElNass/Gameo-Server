@@ -25,7 +25,11 @@ class GameService extends BaseService {
    * const games: any = getAll();
    */
   public async getAll(filterOptions: GamesFilter): Promise<Game[]> {
-    return await this.prismaClient.game.findMany(gameAllQuery(filterOptions));
+    const games: Game[] = await this.prismaClient.game.findMany(
+      gameAllQuery(filterOptions)
+    );
+    if (!games) throw new Error("Games not found", 400);
+    return games;
   }
 
   /**
@@ -36,9 +40,11 @@ class GameService extends BaseService {
    * const game: any = getById(1);
    */
   public async getById(gameId: number): Promise<Game> {
-    return (await this.prismaClient.game.findUnique(
+    const game: Game = (await this.prismaClient.game.findUnique(
       gameSingleByIdQuery(gameId)
     )) as Game;
+    if (!game) throw new Error("Game not found", 400);
+    return game;
   }
 
   /**
@@ -49,9 +55,11 @@ class GameService extends BaseService {
    * const game: any = getBySlug("silly-bandz");
    */
   public async getBySlug(gameSlug: string): Promise<Game> {
-    return (await this.prismaClient.game.findFirst(
+    const game: Game = (await this.prismaClient.game.findFirst(
       gameSingleBySlugQuery(gameSlug)
     )) as Game;
+    if (!game) throw new Error("Game not found", 400);
+    return game;
   }
 }
 

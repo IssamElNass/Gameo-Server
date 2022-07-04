@@ -55,14 +55,11 @@ class AuthController extends BaseController {
       validateRequest(req);
 
       let user: AuthRegisterDTO = req.body;
-
       await this.userService.checkIfUserExists(user.username, user.email);
 
       const tokens: Tokens = await this.authService.saveUser(user);
 
-      return res.status(200).json({
-        tokens,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
@@ -86,9 +83,7 @@ class AuthController extends BaseController {
         signInValues
       );
 
-      return res.status(200).json({
-        tokens,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
@@ -105,9 +100,7 @@ class AuthController extends BaseController {
       const refresh_token: string = req.body.token;
       const tokens: Tokens = await this.authService.refreshToken(refresh_token);
 
-      return res.status(200).json({
-        tokens,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
