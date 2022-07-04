@@ -1,5 +1,6 @@
 import BaseService from "../base.service";
 import { Error } from "../../model/error.model";
+import { User } from "@prisma/client";
 
 class UserService extends BaseService {
   constructor() {
@@ -20,7 +21,7 @@ class UserService extends BaseService {
   }
 
   // get one by email
-  public async getByEmail(email: string): Promise<any> {
+  public async getByEmail(email: string): Promise<User> {
     const result: any = await this.prismaClient.user.findUnique({
       where: {
         email: email,
@@ -32,7 +33,7 @@ class UserService extends BaseService {
     return result;
   }
   // get one by username
-  public async getByUsername(username: string): Promise<any> {
+  public async getByUsername(username: string): Promise<User> {
     const result: any = await this.prismaClient.user.findUnique({
       where: {
         username: username,

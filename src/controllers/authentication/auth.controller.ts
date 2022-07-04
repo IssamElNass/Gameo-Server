@@ -12,6 +12,7 @@ import {
   signInValidator,
   signUpValidator,
 } from "../../validators/auth";
+import { validateRequest } from "../../utils/validation.utils";
 
 /**
  * Authentication Controller
@@ -51,11 +52,7 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      const errors = this.validator(req);
-
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
+      validateRequest(req);
 
       let user: AuthRegisterDTO = req.body;
 
@@ -73,30 +70,22 @@ class AuthController extends BaseController {
 
   public signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = this.validator(req);
+      validateRequest(req);
 
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
-
-      let user: AuthSignInDTO = req.body;
+      const signInValues: AuthSignInDTO = req.body;
 
       const userExists: boolean = (await this.userService.getByEmail(
-        user.email
+        signInValues.email
       ))
         ? true
         : false;
 
       if (!userExists) throw new Error("User doesn't exists", 400);
 
-      const tokens: Tokens | null = await this.authService.signUserIn(user);
+      const tokens: Tokens | null = await this.authService.signUserIn(
+        signInValues
+      );
 
-      if (!tokens)
-        throw new Error(
-          "Login failed, please check your e-mail and password",
-          403
-        );
-      // return response
       return res.status(200).json({
         tokens,
       });
@@ -111,21 +100,13 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      const errors = this.validator(req);
+      validateRequest(req);
 
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
+      const refresh_token: string = req.body.token;
+      const tokens: Tokens = await this.authService.refreshToken(refresh_token);
 
-      // get the data from req.body
-      let refresh_token: string = req.body.token;
-
-      const tokens: any = await this.authService.refreshToken(refresh_token);
-
-      if (!tokens) throw new Error("Please sign in again", 403);
-      // return response
       return res.status(200).json({
-        data: tokens,
+        tokens,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));

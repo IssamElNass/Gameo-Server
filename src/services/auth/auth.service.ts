@@ -10,13 +10,6 @@ import {
 import { generateTokens, verifyToken } from "../../utils/jwt.utils";
 import { Error } from "../../model/error.model";
 
-/*
-/ Get
-/ Save
-/ Put
-/ Delete
-*/
-
 /**
  * This service takes care of the authentication.
  *
@@ -83,7 +76,7 @@ class AuthService extends BaseService {
    * signIn(user);
    */
   public async signUserIn(userAuth: AuthSignInDTO): Promise<Tokens | null> {
-    let foundUser: User = await this.getUserByEmail(userAuth.email);
+    const foundUser: User = await this.getByEmail(userAuth.email);
 
     if (
       foundUser &&
@@ -127,18 +120,17 @@ class AuthService extends BaseService {
 
       return tokens;
     }
-    // return the token
-    return null;
+    throw new Error("Login failed, please check your e-mail and password", 403);
   }
 
   /**
    * Checks if the user password matches the incoming password, signs the user in
    * @param {string} token - The refresh token
-   * @return {Promise<any>} Returns the access and refresh token
+   * @return {Promise<Tokens>} Returns the access and refresh token
    * @example
    * refreshToken("dsnkkdsnfkjndsfkndskjfndsk");
    */
-  public async refreshToken(token: string): Promise<any> {
+  public async refreshToken(token: string): Promise<Tokens> {
     const payload: PayloadDTO = verifyToken(
       token,
       process.env.REFRESH_SECRET as string
@@ -165,8 +157,7 @@ class AuthService extends BaseService {
       return tokens;
     }
 
-    // return the token
-    return null;
+    throw new Error("Please sign in again", 403);
   }
 
   /**
@@ -174,9 +165,9 @@ class AuthService extends BaseService {
    * @param {string} email - The e-mail address
    * @return {Promise<User>} Returns the found user
    * @example
-   * getUserByEmail("bondi@gameo.io");
+   * getByEmail("bondi@gameo.io");
    */
-  public async getUserByEmail(email: string): Promise<User> {
+  public async getByEmail(email: string): Promise<User> {
     return (await this.prismaClient.user.findUnique({
       where: {
         email: email,

@@ -10,6 +10,7 @@ import {
   getBySlugValidator,
 } from "../../validators/game";
 import { GamesFilter } from "../../model/game.model";
+import { validateRequest } from "../../utils/validation.utils";
 
 class GameController extends BaseController {
   private gameService: GameService = new GameService();
@@ -53,12 +54,7 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      const errors = this.validator(req);
-
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
-      console.log(req.query);
+      validateRequest(req);
 
       const filterOptions: GamesFilter = {
         offset: Number(req.query.offset),
@@ -69,7 +65,7 @@ class GameController extends BaseController {
 
       // return response
       return res.status(200).json({
-        games: games,
+        games,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));
@@ -82,21 +78,15 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      console.log(req);
-      const errors = this.validator(req);
-
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
+      validateRequest(req);
 
       const gameId: number = Number(req.query.id) || 0;
       if (gameId === 0) throw new Error("Wrong Id", 400);
 
       const game: any = await this.gameService.getById(gameId);
 
-      // return response
       return res.status(200).json({
-        data: game,
+        game,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));
@@ -109,20 +99,15 @@ class GameController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      const errors = this.validator(req);
+      validateRequest(req);
 
-      if (!errors.isEmpty()) {
-        throw new Error(errors, 500);
-      }
-      //
       const gameSlug: string = req.params.slug || "";
-      if (gameSlug === "") throw new Error("Wrong slug", 400);
+      if (gameSlug === "") throw new Error("Slug not found", 400);
 
       const game: any = await this.gameService.getBySlug(gameSlug);
 
-      // return response
       return res.status(200).json({
-        data: game,
+        game,
       });
     } catch (error: any) {
       next(new Error(error.message, error.status));

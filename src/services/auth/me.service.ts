@@ -2,6 +2,7 @@ import BaseService from "../base.service";
 import { User } from "@prisma/client";
 import { PayloadDTO } from "../../model/auth.model";
 import { verifyToken } from "../../utils/jwt.utils";
+import { getByAccessTokenQuery } from "../../queries/me";
 
 /**
  * This service takes care of the your own profile.
@@ -25,21 +26,9 @@ class MeService extends BaseService {
       token,
       process.env.TOKEN_SECRET as string
     );
-    const result: any = await this.prismaClient.user.findUnique({
-      where: {
-        id: userDetails.userId,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        bio: true,
-        profile_picture: true,
-        role: true,
-        verified: true,
-      },
-    });
-    return result as User;
+    return (await this.prismaClient.user.findUnique(
+      getByAccessTokenQuery(userDetails)
+    )) as User;
   }
 }
 
