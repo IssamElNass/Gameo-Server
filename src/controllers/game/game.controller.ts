@@ -16,31 +16,41 @@ class GameController extends BaseController {
 
   public intializeRoutes() {
     this.setGetRoute({
-      func: this.allGames,
+      func: this.getAllGames,
       path: "/all",
+      validators: [],
     });
+    // this.setGetRoute({
+    //   func: this.getGameById,
+    //   path: "/:id",
+    // });
     this.setGetRoute({
-      func: this.singleGameById,
-      path: "/detail?:id",
+      func: this.getGameBySlug,
+      path: "/:slug",
+      validators: [],
     });
-    this.setPostRoute({
-      func: this.setPlayStatusGame,
-      middelwares: [isAuthenticated],
-      path: "/log",
-    });
-    this.setUpdateRoute({
-      func: this.updatePlayStatusGame,
-      middelwares: [isAuthenticated],
-      path: "/log",
-    });
+    // this.setPostRoute({
+    //   func: this.setPlayStatusGame,
+    //   middelwares: [isAuthenticated],
+    //   path: "/log",
+    // });
+    // this.setUpdateRoute({
+    //   func: this.updatePlayStatusGame,
+    //   middelwares: [isAuthenticated],
+    //   path: "/log",
+    // });
   }
 
-  public allGames = async (req: Request, res: Response, next: NextFunction) => {
+  public getAllGames = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       if (Object.keys(req.body).length > 0)
         throw new Error("Issue with the request body", 400);
 
-      const games: any[] = await this.gameService.getAllGames();
+      const games: any[] = await this.gameService.getAll();
 
       // return response
       return res.status(200).json({
@@ -51,19 +61,44 @@ class GameController extends BaseController {
     }
   };
 
-  public singleGameById = async (
+  public getGameById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.query).length !== 1)
+      console.log(req);
+
+      if (Object.keys(req.params).length !== 1)
         throw new Error("Issue with the query", 400);
 
-      const gameId: number = Number(req.query.id) || 0;
+      const gameId: number = Number(req.params.id) || 0;
       if (gameId === 0) throw new Error("Wrong Id", 400);
 
-      const game: any = await this.gameService.findOneById(gameId);
+      const game: any = await this.gameService.getById(gameId);
+
+      // return response
+      return res.status(200).json({
+        data: game,
+      });
+    } catch (error: any) {
+      next(new Error(error.message, error.status));
+    }
+  };
+
+  public getGameBySlug = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      if (Object.keys(req.params).length !== 1)
+        throw new Error("Issue with the query", 400);
+      //
+      const gameSlug: string = req.params.slug || "";
+      if (gameSlug === "") throw new Error("Wrong slug", 400);
+
+      const game: any = await this.gameService.getBySlug(gameSlug);
 
       // return response
       return res.status(200).json({

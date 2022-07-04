@@ -1,120 +1,63 @@
 import BaseService from "../base.service";
 import { Error } from "../../model/error.model";
+import {
+  gameAllQuery,
+  gameSingleByIdQuery,
+  gameSingleBySlugQuery,
+} from "../../queries/games";
 
+/*
+/ Get
+/ Save
+/ Put
+/ Delete
+*/
+
+/**
+ * This service takes care of the games in the db.
+ *
+ * This includes: Saving a game, Getting trending games, Getting a game by id or slug
+ */
 class GameService extends BaseService {
   constructor() {
     super();
   }
 
-  public async getAllGames(): Promise<any> {
-    const result: any = await this.prismaClient.game.findMany({
-      include: {
-        screenshots: {
-          select: {
-            id: true,
-            caption: true,
-            url: true,
-          },
-        },
-        videos: {
-          select: {
-            id: true,
-            caption: true,
-            url: true,
-          },
-        },
-        companies: {
-          select: {
-            developer: true,
-            publisher: true,
-            company: {
-              select: {
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-        platforms: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        releases: {
-          select: {
-            region: true,
-            release_human: true,
-            platform: {
-              select: {
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-      },
-      take: 10,
-    });
+  /**
+   * Gets all the games from the database
+   * @return {Promise<any>} Returns all the games
+   * @example
+   * const games: any = getAll();
+   */
+  public async getAll(): Promise<any> {
+    const result: any = await this.prismaClient.game.findMany(gameAllQuery());
     return result;
   }
 
-  public async findOneById(id: number): Promise<any> {
-    const result: any = await this.prismaClient.game.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        screenshots: {
-          select: {
-            id: true,
-            caption: true,
-            url: true,
-          },
-        },
-        videos: {
-          select: {
-            id: true,
-            caption: true,
-            url: true,
-          },
-        },
-        companies: {
-          select: {
-            developer: true,
-            publisher: true,
-            company: {
-              select: {
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-        platforms: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        releases: {
-          select: {
-            region: true,
-            release_human: true,
-            platform: {
-              select: {
-                name: true,
-                slug: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return result;
+  /**
+   * Gets a game by the gameId
+   * @param {number} gameId - The id of the game
+   * @return {Promise<any>} Returns the game
+   * @example
+   * const game: any = getById(1);
+   */
+  public async getById(gameId: number): Promise<any> {
+    return await this.prismaClient.game.findUnique(gameSingleByIdQuery(gameId));
   }
+
+  /**
+   * Gets a game by the game slug
+   * @param {string} gameSlug - The slug of the game
+   * @return {Promise<any>} Returns the game
+   * @example
+   * const game: any = getBySlug("silly-bandz");
+   */
+  public async getBySlug(gameSlug: string): Promise<any> {
+    return await this.prismaClient.game.findFirst(
+      gameSingleBySlugQuery(gameSlug)
+    );
+  }
+
   public async addPlayStatusToGame(
     gameId: number,
     statusId: number,

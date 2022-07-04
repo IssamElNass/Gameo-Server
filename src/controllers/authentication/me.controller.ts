@@ -17,6 +17,7 @@ class MeController extends BaseController {
     this.setGetRoute({
       func: this.getCurrentUserByToken,
       middelwares: [isAuthenticated],
+      validators: [],
     });
   }
 

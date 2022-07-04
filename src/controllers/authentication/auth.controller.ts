@@ -4,6 +4,11 @@ import AuthService from "../../services/auth/auth.service";
 import { AuthRegisterDTO, AuthSignInDTO, Tokens } from "../../model/auth.model";
 import UserService from "../../services/user/user.service";
 import { Error } from "../../model/error.model";
+import {
+  refreshValidator,
+  signInValidator,
+  signUpValidator,
+} from "../../validators/auth";
 
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
@@ -15,9 +20,21 @@ class AuthController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setPostRoute({ func: this.registerNewUser, path: "/register" });
-    this.setPostRoute({ func: this.signIn, path: "/signin" });
-    this.setPostRoute({ func: this.refreshToken, path: "/refresh" });
+    this.setPostRoute({
+      func: this.registerNewUser,
+      path: "/register",
+      validators: signUpValidator,
+    });
+    this.setPostRoute({
+      func: this.signIn,
+      path: "/signin",
+      validators: signInValidator,
+    });
+    this.setPostRoute({
+      func: this.refreshToken,
+      path: "/refresh",
+      validators: refreshValidator,
+    });
   }
 
   public registerNewUser = async (
@@ -26,8 +43,11 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length !== 3)
-        throw new Error("Issue with the request body", 400);
+      const errors = this.validator(req);
+
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
 
       // get the data from req.body
       let user: AuthRegisterDTO = req.body;
@@ -48,8 +68,11 @@ class AuthController extends BaseController {
 
   public signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (Object.keys(req.body).length < 1)
-        throw new Error("Issue with the request body", 400);
+      const errors = this.validator(req);
+
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
 
       // get the data from req.body
       let user: AuthSignInDTO = req.body;
@@ -85,8 +108,11 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length !== 1)
-        throw new Error("Issue with the request body", 400);
+      const errors = this.validator(req);
+
+      if (!errors.isEmpty()) {
+        throw new Error(errors, 500);
+      }
 
       // get the data from req.body
       let refresh_token: string = req.body.token;

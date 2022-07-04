@@ -1,8 +1,10 @@
+import { Result, ValidationError } from "express-validator";
+
 export class Error {
-  message: string;
+  message: string | Result<ValidationError>;
   status: number;
 
-  constructor(message: string, status: number = 500) {
+  constructor(message: string | Result<ValidationError>, status: number = 500) {
     this.message = message;
     this.status = status;
   }

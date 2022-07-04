@@ -12,7 +12,11 @@ class UserController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setGetRoute({ func: this.getUsers, middelwares: [isAuthenticated] });
+    this.setGetRoute({
+      func: this.getUsers,
+      middelwares: [isAuthenticated],
+      validators: [],
+    });
   }
 
   public getUsers = async (req: Request, res: Response, next: NextFunction) => {
