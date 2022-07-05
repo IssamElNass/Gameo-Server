@@ -48,6 +48,13 @@ export const gameAllQuery = (filterOptions: GamesFilter): any => {
           },
         },
       },
+      game_websites: {
+        select: {
+          type: true,
+          url: true,
+          igdb_id: true,
+        },
+      },
     },
     skip: filterOptions.offset,
     take: filterOptions.limit,
@@ -105,6 +112,13 @@ export const gameSingleByIdQuery = (gameId: number): any => {
           },
         },
       },
+      game_websites: {
+        select: {
+          type: true,
+          url: true,
+          igdb_id: true,
+        },
+      },
     },
   };
 };
@@ -158,6 +172,13 @@ export const gameSingleBySlugQuery = (gameSlug: string): any => {
               slug: true,
             },
           },
+        },
+      },
+      game_websites: {
+        select: {
+          type: true,
+          url: true,
+          igdb_id: true,
         },
       },
     },

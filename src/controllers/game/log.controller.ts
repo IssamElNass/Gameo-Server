@@ -12,7 +12,7 @@ class LogController extends BaseController {
   private userService: UserService = new UserService();
 
   constructor() {
-    super("/games");
+    super("/log");
     this.intializeRoutes();
   }
 
@@ -20,13 +20,11 @@ class LogController extends BaseController {
     this.setPostRoute({
       func: this.saveLog,
       middelwares: [isAuthenticated],
-      path: "/log",
       validators: saveUpdateLogValidator,
     });
     this.setUpdateRoute({
       func: this.putLog,
       middelwares: [isAuthenticated],
-      path: "/log",
       validators: saveUpdateLogValidator,
     });
   }

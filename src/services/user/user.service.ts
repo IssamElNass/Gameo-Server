@@ -54,7 +54,7 @@ class UserService extends BaseService {
         bio: true,
       },
     })) as User;
-    if (!user) throw new Error("User not found", 400);
+    // if (!user) throw new Error("User not found", 400);
     return user;
   }
 
@@ -77,7 +77,7 @@ class UserService extends BaseService {
         bio: true,
       },
     })) as User;
-    if (!user) throw new Error("User not found", 400);
+    // if (!user) throw new Error("User not found", 400);
     return user;
   }
 
