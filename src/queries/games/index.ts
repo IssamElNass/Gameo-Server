@@ -1,60 +1,67 @@
 import { GamesFilter, GamesOtherFilter } from "../../model/game.model";
 
+// include: {
+//   screenshots: {
+//     select: {
+//       id: true,
+//       caption: true,
+//       url: true,
+//     },
+//   },
+//   videos: {
+//     select: {
+//       id: true,
+//       caption: true,
+//       url: true,
+//     },
+//   },
+//   companies: {
+//     select: {
+//       developer: true,
+//       publisher: true,
+//       company: {
+//         select: {
+//           name: true,
+//           slug: true,
+//         },
+//       },
+//     },
+//   },
+//   platforms: {
+//     select: {
+//       id: true,
+//       name: true,
+//       slug: true,
+//     },
+//   },
+//   releases: {
+//     select: {
+//       region: true,
+//       release_human: true,
+//       platform: {
+//         select: {
+//           name: true,
+//           slug: true,
+//         },
+//       },
+//     },
+//   },
+//   game_websites: {
+//     select: {
+//       type: true,
+//       url: true,
+//       igdb_id: true,
+//     },
+//   },
+
 export const gameAllQuery = (filterOptions: GamesFilter): any => {
   return {
-    include: {
-      screenshots: {
-        select: {
-          id: true,
-          caption: true,
-          url: true,
-        },
-      },
-      videos: {
-        select: {
-          id: true,
-          caption: true,
-          url: true,
-        },
-      },
-      companies: {
-        select: {
-          developer: true,
-          publisher: true,
-          company: {
-            select: {
-              name: true,
-              slug: true,
-            },
-          },
-        },
-      },
-      platforms: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-        },
-      },
-      releases: {
-        select: {
-          region: true,
-          release_human: true,
-          platform: {
-            select: {
-              name: true,
-              slug: true,
-            },
-          },
-        },
-      },
-      game_websites: {
-        select: {
-          type: true,
-          url: true,
-          igdb_id: true,
-        },
-      },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      igdb_id: true,
+      gamecover: true,
     },
     skip: filterOptions.offset,
     take: filterOptions.limit,
