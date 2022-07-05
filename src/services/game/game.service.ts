@@ -4,8 +4,11 @@ import {
   gameAllQuery,
   gameSingleByIdQuery,
   gameSingleBySlugQuery,
+  gameAllGenreQuery,
+  gameAllPlatformQuery,
+  gameAllCompanyQuery,
 } from "../../queries/games";
-import { GamesFilter } from "../../model/game.model";
+import { GamesFilter, GamesOtherFilter } from "../../model/game.model";
 import { Game } from "@prisma/client";
 
 /**
@@ -60,6 +63,52 @@ class GameService extends BaseService {
     )) as Game;
     if (!game) throw new Error("Game not found", 400);
     return game;
+  }
+
+  /**
+   * Gets all the games by a single genre from the database
+   * @return {Promise<Game[]>} Returns all the games
+   * @example
+   * const games: Game[] = getAllByGenre();
+   */
+  public async getAllByGenre(filterOptions: GamesOtherFilter): Promise<Game[]> {
+    const games: Game[] = await this.prismaClient.game.findMany(
+      gameAllGenreQuery(filterOptions)
+    );
+    if (!games) throw new Error("Games not found", 400);
+    return games;
+  }
+
+  /**
+   * Gets all the games by a single platform from the database
+   * @return {Promise<Game[]>} Returns all the games
+   * @example
+   * const games: Game[] = getAllByPlatform();
+   */
+  public async getAllByPlatform(
+    filterOptions: GamesOtherFilter
+  ): Promise<Game[]> {
+    const games: Game[] = await this.prismaClient.game.findMany(
+      gameAllPlatformQuery(filterOptions)
+    );
+    if (!games) throw new Error("Games not found", 400);
+    return games;
+  }
+
+  /**
+   * Gets all the games by a company from the database
+   * @return {Promise<Game[]>} Returns all the games
+   * @example
+   * const games: Game[] = getAllByCompany();
+   */
+  public async getAllByCompany(
+    filterOptions: GamesOtherFilter
+  ): Promise<Game[]> {
+    const games: Game[] = await this.prismaClient.game.findMany(
+      gameAllCompanyQuery(filterOptions)
+    );
+    if (!games) throw new Error("Games not found", 400);
+    return games;
   }
 }
 
