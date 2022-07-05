@@ -9,6 +9,7 @@ import {
 } from "../../model/auth.model";
 import { generateTokens, verifyToken } from "../../utils/jwt.utils";
 import { Error } from "../../model/error.model";
+import { createTokenQuery, updateTokenQuery } from "../../queries/auth";
 
 /**
  * This service takes care of the authentication.
@@ -28,7 +29,7 @@ class AuthService extends BaseService {
    * const user: AuthRegisterDTO = {username: 'bondi', email: 'bondi@gameo.io', password: 'test'};
    * registerUser(user);
    */
-  public async registerUser(user: AuthRegisterDTO): Promise<Tokens> {
+  public async saveUser(user: AuthRegisterDTO): Promise<Tokens> {
     // Hash Password
     const hashedPassword = bcrypt.hashSync(user.password, 14);
 
@@ -53,7 +54,7 @@ class AuthService extends BaseService {
     // Create the access and refresh token
     const tokens: Tokens = generateTokens(payload);
 
-    const createdToken = await this.addTokenToDatabase(
+    const createdToken: Token = await this.saveToken(
       createdUser,
       tokens.refresh_token
     );
@@ -75,8 +76,8 @@ class AuthService extends BaseService {
    * const userAuth: AuthSignInDTO = {email: 'bondi@gameo.io', password: 'test'};
    * signIn(user);
    */
-  public async signIn(userAuth: AuthSignInDTO): Promise<Tokens | null> {
-    let foundUser: User = await this.getUserByEmail(userAuth.email);
+  public async signUserIn(userAuth: AuthSignInDTO): Promise<Tokens | null> {
+    const foundUser: User = await this.getByEmail(userAuth.email);
 
     if (
       foundUser &&
@@ -90,14 +91,14 @@ class AuthService extends BaseService {
       // Create token
       const tokens: Tokens = generateTokens(payload);
 
-      const result = await this.prismaClient.token.findUnique({
+      const result: Token = (await this.prismaClient.token.findUnique({
         where: {
           userId: foundUser.id,
         },
-      });
+      })) as Token;
 
       if (result) {
-        const updatedToken = await this.updateTokenInDatabase(
+        const updatedToken = await this.putToken(
           foundUser,
           tokens.refresh_token
         );
@@ -107,7 +108,7 @@ class AuthService extends BaseService {
             "Something went wrong with updating the token into the database"
           );
       } else {
-        const createdToken = await this.addTokenToDatabase(
+        const createdToken = await this.saveToken(
           foundUser,
           tokens.refresh_token
         );
@@ -120,31 +121,29 @@ class AuthService extends BaseService {
 
       return tokens;
     }
-    // return the token
-    return null;
+    throw new Error("Login failed, please check your e-mail and password", 403);
   }
 
   /**
    * Checks if the user password matches the incoming password, signs the user in
    * @param {string} token - The refresh token
-   * @return {Promise<any>} Returns the access and refresh token
+   * @return {Promise<Tokens>} Returns the access and refresh token
    * @example
    * refreshToken("dsnkkdsnfkjndsfkndskjfndsk");
    */
-  public async refreshToken(token: string): Promise<any> {
+  public async refreshToken(token: string): Promise<Tokens> {
     const payload: PayloadDTO = verifyToken(
       token,
       process.env.REFRESH_SECRET as string
     );
 
-    if (!payload) throw new Error("error not valid", 400);
+    if (!payload) throw new Error("Not valid", 400);
 
     const result = await this.prismaClient.token.findUnique({
       where: {
         userId: payload.userId,
       },
     });
-    console.log(result);
 
     if (result && (await bcrypt.compare(token, result.token))) {
       // check expiry date
@@ -153,42 +152,12 @@ class AuthService extends BaseService {
       // Create token
       const tokens: Tokens = generateTokens(payload);
 
-      this.updateTokenInDatabase(payload.userId, tokens.refresh_token);
+      this.putToken(payload.userId, tokens.refresh_token);
 
       return tokens;
     }
 
-    // return the token
-    return null;
-  }
-
-  /**
-   * Gets the user by using their access token
-   * @param {string} token - The access token
-   * @return {Promise<User>} Returns the found user
-   * @example
-   * getUserByToken("dsnkkdsnfkjndsfkndskjfndsk");
-   */
-  public async getUserByToken(token: string): Promise<User> {
-    const userDetails: PayloadDTO = verifyToken(
-      token,
-      process.env.TOKEN_SECRET as string
-    );
-    const result: any = await this.prismaClient.user.findUnique({
-      where: {
-        id: userDetails.userId,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        bio: true,
-        profile_picture: true,
-        role: true,
-        verified: true,
-      },
-    });
-    return result as User;
+    throw new Error("Please sign in again", 403);
   }
 
   /**
@@ -196,9 +165,9 @@ class AuthService extends BaseService {
    * @param {string} email - The e-mail address
    * @return {Promise<User>} Returns the found user
    * @example
-   * getUserByEmail("bondi@gameo.io");
+   * getByEmail("bondi@gameo.io");
    */
-  public async getUserByEmail(email: string): Promise<User> {
+  public async getByEmail(email: string): Promise<User> {
     return (await this.prismaClient.user.findUnique({
       where: {
         email: email,
@@ -214,20 +183,10 @@ class AuthService extends BaseService {
    * @example
    * addTokenToDatabase(user, 'dfnsdfjsdnfjsndfkjdnsfkn');
    */
-  public async addTokenToDatabase(
-    user: User,
-    refresh_token: string
-  ): Promise<Token> {
-    let expireDate = new Date();
-    expireDate.setDate(expireDate.getDate() + 7);
-
-    return await this.prismaClient.token.create({
-      data: {
-        token: bcrypt.hashSync(refresh_token, 14),
-        userId: user.id,
-        expires_at: expireDate,
-      },
-    });
+  public async saveToken(user: User, refresh_token: string): Promise<Token> {
+    return await this.prismaClient.token.create(
+      createTokenQuery(user, refresh_token)
+    );
   }
 
   /**
@@ -238,24 +197,15 @@ class AuthService extends BaseService {
    * @example
    * updateTokenInDatabase("sfdsdsfds-dsfdsfdsfdsf-dsfdsfsdf", 'dfnsdfjsdnfjsndfkjdnsfkn');
    */
-  public async updateTokenInDatabase(
+  public async putToken(
     user: User | string,
     refresh_token: string
   ): Promise<Token> {
-    let expireDate = new Date();
-    expireDate.setDate(expireDate.getDate() + 7);
-
     const userId: string = typeof user === "string" ? user : user.id;
 
-    return await this.prismaClient.token.update({
-      where: {
-        userId: userId,
-      },
-      data: {
-        token: bcrypt.hashSync(refresh_token, 14),
-        expires_at: expireDate,
-      },
-    });
+    return await this.prismaClient.token.update(
+      updateTokenQuery(userId, refresh_token)
+    );
   }
 }
 

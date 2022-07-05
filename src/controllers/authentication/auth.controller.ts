@@ -1,10 +1,24 @@
-import BaseController from "../base.controller";
 import { Request, Response, NextFunction } from "express";
-import AuthService from "../../services/auth/auth.service";
+// Base Controller
+import BaseController from "../base.controller";
+// Services
+import { AuthService, UserService } from "../../services";
+// Models
 import { AuthRegisterDTO, AuthSignInDTO, Tokens } from "../../model/auth.model";
-import UserService from "../../services/user/user.service";
 import { Error } from "../../model/error.model";
+// Validators
+import {
+  refreshValidator,
+  signInValidator,
+  signUpValidator,
+} from "../../validators/auth";
+import { validateRequest } from "../../utils/validation.utils";
 
+/**
+ * Authentication Controller
+ *
+ * Requests to sign the user up or in, refresh their token
+ */
 class AuthController extends BaseController {
   private authService: AuthService = new AuthService();
   private userService: UserService = new UserService();
@@ -15,9 +29,21 @@ class AuthController extends BaseController {
   }
 
   public intializeRoutes() {
-    this.setPostRoute({ func: this.registerNewUser, path: "/register" });
-    this.setPostRoute({ func: this.signIn, path: "/signin" });
-    this.setPostRoute({ func: this.refreshToken, path: "/refresh" });
+    this.setPostRoute({
+      func: this.registerNewUser,
+      path: "/register",
+      validators: signUpValidator,
+    });
+    this.setPostRoute({
+      func: this.signIn,
+      path: "/signin",
+      validators: signInValidator,
+    });
+    this.setPostRoute({
+      func: this.refreshToken,
+      path: "/refresh",
+      validators: refreshValidator,
+    });
   }
 
   public registerNewUser = async (
@@ -26,21 +52,14 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length !== 3)
-        throw new Error("Issue with the request body", 400);
+      validateRequest(req);
 
-      // get the data from req.body
       let user: AuthRegisterDTO = req.body;
-
-      // Check if username / email is already linked with a user
       await this.userService.checkIfUserExists(user.username, user.email);
 
-      const tokens: Tokens = await this.authService.registerUser(user);
+      const tokens: Tokens = await this.authService.saveUser(user);
 
-      // return response
-      return res.status(200).json({
-        tokens,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
@@ -48,32 +67,23 @@ class AuthController extends BaseController {
 
   public signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (Object.keys(req.body).length < 1)
-        throw new Error("Issue with the request body", 400);
+      validateRequest(req);
 
-      // get the data from req.body
-      let user: AuthSignInDTO = req.body;
+      const signInValues: AuthSignInDTO = req.body;
 
-      // Check if user exists
-      const userExists: boolean = (await this.userService.findOneByEmail(
-        user.email.trim()
+      const userExists: boolean = (await this.userService.getByEmail(
+        signInValues.email
       ))
         ? true
         : false;
 
       if (!userExists) throw new Error("User doesn't exists", 400);
 
-      const userWithToken: any = await this.authService.signIn(user);
+      const tokens: Tokens | null = await this.authService.signUserIn(
+        signInValues
+      );
 
-      if (!userWithToken)
-        throw new Error(
-          "Login failed, please check your e-mail and password",
-          403
-        );
-      // return response
-      return res.status(200).json({
-        data: userWithToken,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
@@ -85,19 +95,12 @@ class AuthController extends BaseController {
     next: NextFunction
   ) => {
     try {
-      if (Object.keys(req.body).length !== 1)
-        throw new Error("Issue with the request body", 400);
+      validateRequest(req);
 
-      // get the data from req.body
-      let refresh_token: string = req.body.token;
+      const refresh_token: string = req.body.token;
+      const tokens: Tokens = await this.authService.refreshToken(refresh_token);
 
-      const tokens: any = await this.authService.refreshToken(refresh_token);
-
-      if (!tokens) throw new Error("Please sign in again", 403);
-      // return response
-      return res.status(200).json({
-        data: tokens,
-      });
+      return res.status(200).json(tokens);
     } catch (error: any) {
       next(new Error(error.message, error.status));
     }
