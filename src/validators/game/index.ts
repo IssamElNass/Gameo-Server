@@ -18,7 +18,7 @@ export const getByIdValidator: any[] = [
 export const getBySlugValidator: any[] = [
   param("slug")
     .notEmpty()
-    .isSlug()
+
     .withMessage("must be a string and not empty"),
 ];
 
