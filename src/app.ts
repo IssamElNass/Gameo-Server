@@ -27,16 +27,33 @@ class App {
     this.app.use(express.json());
 
     this.app.use((req, res, next) => {
-      // set the CORS policy
-      res.header("Access-Control-Allow-Origin", "*");
-      // set the CORS headers
-      res.header(
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+
+      res.setHeader(
         "Access-Control-Allow-Headers",
-        "origin, X-Requested-With,Content-Type,Accept, Authorization"
+        "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
       );
-      // set the CORS method headers
+
+      // // set the CORS policy
+      // res.header("Access-Control-Allow-Origin", "*");
+      // // set the CORS headers
+      // res.header(
+      //   "Access-Control-Allow-Headers",
+      //   "origin, X-Requested-With, Content-Type, Accept, Authorization"
+      // );
+      // res.setHeader("Access-Control-Allow-Credentials", "true");
+
+      // res.header(
+      //   "Access-Control-Allow-Methods",
+      //   "GET PATCH DELETE POST OPTIONS PUT"
+      // );
+      // // set the CORS method headers
       if (req.method === "OPTIONS") {
-        res.header("Access-Control-Allow-Methods", "GET PATCH DELETE POST");
+        res.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET,HEAD,OPTIONS,POST,PUT"
+        );
         return res.status(200).json({});
       }
       next();
